@@ -892,12 +892,9 @@
         <div class="instructions">
             <h4>How to Play</h4>
             <ul>
-                <li>Type any city name worldwide</li>
-                <li>Watch your avatar travel there</li>
-                <li>Take selfies at City Halls (+5 pts)</li>
-                <li>Tyler offices = +10 points</li>
-                <li>Plano/Yarmouth = +50 points!</li>
-                <li>PBB cities = +25 points</li>
+                <li>Search for any city worldwide</li>
+                <li>Take selfies at City Halls</li>
+                <li>Discover bonus cities for extra points!</li>
             </ul>
         </div>
 
@@ -991,15 +988,44 @@
             placesService: null
         };
 
-        // Special Cities Database
+        // Special Cities Database - Expanded!
         const specialCities = {
+            // Tyler Major Offices - 50 points
             'plano': { type: 'tyler-major', points: 50, lat: 33.0198, lng: -96.6989 },
             'yarmouth': { type: 'tyler-major', points: 50, lat: 43.8007, lng: -70.1870 },
-            'denver': { type: 'pbb', points: 25, lat: 39.7392, lng: -104.9903 },
-            'portland': { type: 'pbb', points: 25, lat: 45.5152, lng: -122.6784 },
+            
+            // Tyler Offices - 10 points
             'austin': { type: 'tyler', points: 10, lat: 30.2672, lng: -97.7431 },
             'dallas': { type: 'tyler', points: 10, lat: 32.7767, lng: -96.7970 },
-            'detroit': { type: 'tyler', points: 10, lat: 42.3314, lng: -83.0458 }
+            'detroit': { type: 'tyler', points: 10, lat: 42.3314, lng: -83.0458 },
+            'lubbock': { type: 'tyler', points: 10, lat: 33.5779, lng: -101.8552 },
+            'kansas city': { type: 'tyler', points: 10, lat: 39.0997, lng: -94.5786 },
+            'denver': { type: 'tyler', points: 10, lat: 39.7392, lng: -104.9903 },
+            'salem': { type: 'tyler', points: 10, lat: 44.9429, lng: -123.0351 },
+            'olympia': { type: 'tyler', points: 10, lat: 47.0379, lng: -122.9007 },
+            'atlanta': { type: 'tyler', points: 10, lat: 33.7490, lng: -84.3880 },
+            'columbus': { type: 'tyler', points: 10, lat: 39.9612, lng: -82.9988 },
+            'philadelphia': { type: 'tyler', points: 10, lat: 39.9526, lng: -75.1652 },
+            'albany': { type: 'tyler', points: 10, lat: 42.6526, lng: -73.7562 },
+            
+            // Priority Based Budgeting Cities - 25 points
+            'boulder': { type: 'pbb', points: 25, lat: 40.0150, lng: -105.2705 },
+            'fort collins': { type: 'pbb', points: 25, lat: 40.5853, lng: -105.0844 },
+            'lakewood': { type: 'pbb', points: 25, lat: 39.7047, lng: -105.0814 },
+            'westminster': { type: 'pbb', points: 25, lat: 39.8361, lng: -105.0372 },
+            'arvada': { type: 'pbb', points: 25, lat: 39.8028, lng: -105.0875 },
+            'thornton': { type: 'pbb', points: 25, lat: 39.8680, lng: -104.9719 },
+            'portland': { type: 'pbb', points: 25, lat: 45.5152, lng: -122.6784 },
+            'eugene': { type: 'pbb', points: 25, lat: 44.0521, lng: -123.0868 },
+            'gresham': { type: 'pbb', points: 25, lat: 45.4983, lng: -122.4302 },
+            'san antonio': { type: 'pbb', points: 25, lat: 29.4241, lng: -98.4936 },
+            'cincinnati': { type: 'pbb', points: 25, lat: 39.1031, lng: -84.5120 },
+            'pittsburgh': { type: 'pbb', points: 25, lat: 40.4406, lng: -79.9959 },
+            'reno': { type: 'pbb', points: 25, lat: 39.5296, lng: -119.8138 },
+            'henderson': { type: 'pbb', points: 25, lat: 36.0395, lng: -114.9817 },
+            'chandler': { type: 'pbb', points: 25, lat: 33.3062, lng: -111.8413 },
+            'mesa': { type: 'pbb', points: 25, lat: 33.4152, lng: -111.8315 },
+            'scottsdale': { type: 'pbb', points: 25, lat: 33.4942, lng: -111.9261 }
         };
 
         // Initialize Google Map
@@ -1171,24 +1197,91 @@
             document.getElementById('locationSearch').value = '';
         }
 
-        // Search for City Hall Image
+        // Search for City Hall Image - Enhanced with multiple services
         async function searchCityHallImage(cityName) {
             try {
-                // Use Google Custom Search API or fallback to a default image
-                // For demo, using a placeholder approach
-                const searchQuery = `${cityName} city hall building`;
+                // Try multiple image sources for real city hall photos
+                const imageSearches = [
+                    // Wikimedia Commons search for city halls
+                    `https://commons.wikimedia.org/wiki/Special:Search?search=${encodeURIComponent(cityName)}+city+hall&title=Special:Search&profile=default&fulltext=1`,
+                    
+                    // Unsplash with specific city hall query
+                    `https://source.unsplash.com/600x400/?${encodeURIComponent(cityName)}-city-hall,government-building,civic-center`,
+                    
+                    // Pexels API (would need API key)
+                    `https://images.pexels.com/photos/search/?query=${encodeURIComponent(cityName)}+city+hall`,
+                    
+                    // Bing Image Search (would need API key)
+                    `https://api.bing.microsoft.com/v7.0/images/search?q=${encodeURIComponent(cityName)}+city+hall+building`
+                ];
                 
-                // You would need to implement actual image search here
-                // For now, using a generated placeholder
-                const imageUrl = `https://source.unsplash.com/600x400/?city-hall,${encodeURIComponent(cityName)},government-building`;
+                // For production, you'd want to use Google Custom Search API
+                // Here's how you'd implement it with your Google API key:
+                if (window.google && google.maps && gameState.placesService) {
+                    // Search for city hall using Places API
+                    const request = {
+                        query: `${cityName} city hall`,
+                        fields: ['photos', 'name', 'formatted_address']
+                    };
+                    
+                    gameState.placesService.findPlaceFromQuery(request, (results, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0]) {
+                            if (results[0].photos && results[0].photos.length > 0) {
+                                const photoUrl = results[0].photos[0].getUrl({
+                                    maxWidth: 600,
+                                    maxHeight: 400
+                                });
+                                document.getElementById('selfieBackground').style.backgroundImage = `url(${photoUrl})`;
+                                return;
+                            }
+                        }
+                        // Fallback to Unsplash if Google Places doesn't have photos
+                        useFallbackImage(cityName);
+                    });
+                } else {
+                    // Use fallback image service
+                    useFallbackImage(cityName);
+                }
                 
-                document.getElementById('selfieBackground').style.backgroundImage = `url(${imageUrl})`;
             } catch (error) {
                 console.error('Image search failed:', error);
-                // Use default city hall image
-                document.getElementById('selfieBackground').style.backgroundImage = 
-                    'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjIwMCIgeT0iMTUwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDE1MCAzMDAsMTAwIDQwMCwxNTAiIGZpbGw9IiM4YjQ1MTMiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2MCI+8J+PmzwvdGV4dD4KPC9zdmc+)';
+                useFallbackImage(cityName);
             }
+        }
+        
+        // Fallback image function
+        function useFallbackImage(cityName) {
+            // Try multiple image sources
+            const imageUrls = [
+                `https://source.unsplash.com/600x400/?${encodeURIComponent(cityName)},city-hall,government`,
+                `https://loremflickr.com/600/400/${encodeURIComponent(cityName)},cityhall,government/all`,
+                `https://picsum.photos/600/400?random=${encodeURIComponent(cityName)}`
+            ];
+            
+            // Try to load the first working image
+            const img = new Image();
+            let currentIndex = 0;
+            
+            function tryNextImage() {
+                if (currentIndex < imageUrls.length) {
+                    img.src = imageUrls[currentIndex];
+                    currentIndex++;
+                } else {
+                    // Use default city hall if all fail
+                    document.getElementById('selfieBackground').style.backgroundImage = 
+                        'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjIwMCIgeT0iMTUwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDE1MCAzMDAsMTAwIDQwMCwxNTAiIGZpbGw9IiM4YjQ1MTMiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2MCI+8J+PmzwvdGV4dD4KPC9zdmc+)';
+                }
+            }
+            
+            img.onload = function() {
+                document.getElementById('selfieBackground').style.backgroundImage = `url(${img.src})`;
+            };
+            
+            img.onerror = function() {
+                tryNextImage();
+            };
+            
+            tryNextImage();
         }
 
         // Animate Avatar to Location
