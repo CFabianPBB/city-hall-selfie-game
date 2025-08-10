@@ -802,19 +802,164 @@
             50% { opacity: 0.5; }
         }
 
-        /* Map Marker for City Hall */
-        .city-hall-marker {
+        /* Influencer Avatars */
+        .influencer-avatar {
+            position: absolute;
             width: 40px;
-            height: 40px;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjAiIHk9IjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn4+bPC90ZXh0Pgo8L3N2Zz4=');
-            background-size: contain;
+            height: 50px;
+            z-index: 50;
             cursor: pointer;
-            animation: bounce 2s infinite;
+            transition: all 0.3s;
+            animation: influencerWalk 20s linear infinite;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes influencerWalk {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(30px) translateY(-20px); }
+            50% { transform: translateX(-20px) translateY(30px); }
+            75% { transform: translateX(40px) translateY(20px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        .influencer-avatar:hover {
+            transform: scale(1.2);
+            z-index: 60;
+        }
+
+        .influencer-head {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .influencer-head::after {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            font-size: 12px;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .influencer-body {
+            width: 25px;
+            height: 20px;
+            background: #2c3e50;
+            margin: -5px auto 0;
+            border-radius: 10px 10px 5px 5px;
+        }
+
+        /* Influencer Found Modal */
+        .influencer-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 0 3px #000, 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 2001;
+            text-align: center;
+            animation: bounceIn 0.5s ease;
+        }
+
+        .influencer-modal.show {
+            display: block;
+        }
+
+        .influencer-modal h2 {
+            color: #27ae60;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .influencer-modal .influencer-name {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .influencer-modal .influencer-location {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .influencer-modal .points-earned {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: #2c3e50;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .influencer-modal button {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: 2px solid #000;
+            padding: 10px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        /* Influencer Counter */
+        .influencer-counter {
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            background: linear-gradient(145deg, #9b59b6, #8e44ad);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 0 2px #000, 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 200;
+            color: white;
+            text-align: center;
+        }
+
+        .influencer-counter-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .influencer-counter-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+            color: #f1c40f;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .influencer-counter-total {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -897,6 +1042,13 @@
             </ul>
         </div>
 
+        <!-- Influencer Counter -->
+        <div class="influencer-counter">
+            <div class="influencer-counter-label">Influencers Found</div>
+            <div class="influencer-counter-value" id="influencerCount">0</div>
+            <div class="influencer-counter-total">of 105</div>
+        </div>
+
         <!-- Leaderboard -->
         <div class="leaderboard">
             <h3>Top Players</h3>
@@ -964,6 +1116,18 @@
         </div>
     </div>
 
+    <!-- Influencer Found Modal -->
+    <div class="influencer-modal" id="influencerModal">
+        <h2>🌟 INFLUENCER FOUND! 🌟</h2>
+        <div class="influencer-name" id="influencerName"></div>
+        <div class="influencer-location" id="influencerLocation"></div>
+        <div class="points-earned">+15 POINTS!</div>
+        <div style="margin: 15px 0; color: #7f8c8d; font-size: 13px;">
+            ELGL Local Government Leader
+        </div>
+        <button onclick="closeInfluencerModal()">AWESOME!</button>
+    </div>
+
     <!-- Background Music -->
     <audio id="bgMusic" loop>
         <source src="data:audio/mpeg;base64,SUQzAwAAAAAAIVRYWFgAAAANAAAAU29mdHdhcmUAR2FyYWdlQmFuZABUWFhYAAAADwAAAGNvbW1lbnQAQ29tbWVudAD/80DEAAAAA0gAAAAATEFNRTMuOTlyAQAB">
@@ -988,7 +1152,117 @@
             googleMapsLoaded: false
         };
 
-        // Special Cities Database - Expanded!
+        // ELGL Influencers Database - 105 Amazing Local Gov Leaders!
+        const elglInfluencers = [
+            { name: "Kirsten Wyatt", location: "West Linn, OR", initials: "KW", color: "#FF6B6B" },
+            { name: "Kent Wyatt", location: "Tigard, OR", initials: "KW", color: "#4ECDC4" },
+            { name: "Ben Kittelson", location: "Durham, NC", initials: "BK", color: "#45B7D1" },
+            { name: "Michael Montgomery", location: "Colorado Springs, CO", initials: "MM", color: "#96CEB4" },
+            { name: "Meredith Reynolds", location: "Long Beach, CA", initials: "MR", color: "#FFEAA7" },
+            { name: "Mike Ekey", location: "Belton, MO", initials: "ME", color: "#DDA0DD" },
+            { name: "Cassie Johnson", location: "Scottsdale, AZ", initials: "CJ", color: "#98D8C8" },
+            { name: "Jackie Wehmeyer", location: "Parkland, FL", initials: "JW", color: "#FFB6C1" },
+            { name: "Matthew Bajor", location: "Algonquin, IL", initials: "MB", color: "#87CEEB" },
+            { name: "Matt Horn", location: "Geneva, NY", initials: "MH", color: "#F4A460" },
+            { name: "Nathan Hellyer", location: "Mesa, AZ", initials: "NH", color: "#9370DB" },
+            { name: "Sarah Hazel", location: "San Rafael, CA", initials: "SH", color: "#20B2AA" },
+            { name: "Kendra Davis", location: "Princeton, NJ", initials: "KD", color: "#FF69B4" },
+            { name: "Jasmine Lewis", location: "Chicago, IL", initials: "JL", color: "#00CED1" },
+            { name: "Brittany Howard", location: "Fort Worth, TX", initials: "BH", color: "#FF1493" },
+            { name: "Katie Babits", location: "Gainesville, FL", initials: "KB", color: "#32CD32" },
+            { name: "Rafael Baptista", location: "West Hollywood, CA", initials: "RB", color: "#FFD700" },
+            { name: "Kelly Brenna", location: "Durham, NC", initials: "KB", color: "#FF4500" },
+            { name: "Laura Kushner", location: "Kalamazoo, MI", initials: "LK", color: "#DA70D6" },
+            { name: "Kent Bull", location: "Camas, WA", initials: "KB", color: "#00FA9A" },
+            { name: "Zac Horton", location: "Yukon, OK", initials: "ZH", color: "#1E90FF" },
+            { name: "Megan George", location: "Topeka, KS", initials: "MG", color: "#FF6347" },
+            { name: "Rachel Pinkus", location: "Surprise, AZ", initials: "RP", color: "#40E0D0" },
+            { name: "Phillip Messina", location: "Tualatin, OR", initials: "PM", color: "#EE82EE" },
+            { name: "Josh Schoemann", location: "Washington County, WI", initials: "JS", color: "#F0E68C" },
+            { name: "Ashley Jacobs", location: "Rock Hill, SC", initials: "AJ", color: "#90EE90" },
+            { name: "Mallory Roberts", location: "Arlington, VA", initials: "MR", color: "#FFB6C1" },
+            { name: "Ellen Fortin", location: "Laramie, WY", initials: "EF", color: "#FFA07A" },
+            { name: "Courtney Barwick", location: "Seattle, WA", initials: "CB", color: "#20B2AA" },
+            { name: "Katie Carley", location: "Muskegon, MI", initials: "KC", color: "#778899" },
+            { name: "Kylie Gemmell", location: "Buda, TX", initials: "KG", color: "#B0C4DE" },
+            { name: "Chris Fabian", location: "Thornton, CO", initials: "CF", color: "#FFD700" }, // YOU! Special color!
+            { name: "Felicia Johnson", location: "Hayward, CA", initials: "FJ", color: "#FF69B4" },
+            { name: "Elizabeth Dragon", location: "Keene, NH", initials: "ED", color: "#8A2BE2" },
+            { name: "Jason Yarbrough", location: "Columbia, SC", initials: "JY", color: "#A52A2A" },
+            { name: "Danielle Dahl", location: "Minneota, MN", initials: "DD", color: "#5F9EA0" },
+            { name: "Bill Brawley", location: "Salisbury, NC", initials: "BB", color: "#D2691E" },
+            { name: "Nathan Shueth", location: "Castle Rock, CO", initials: "NS", color: "#FF7F50" },
+            { name: "Amanda Jarosz", location: "Mesa, AZ", initials: "AJ", color: "#6495ED" },
+            { name: "Celia Kupersmith", location: "San Francisco, CA", initials: "CK", color: "#DC143C" },
+            { name: "Gwendolyn Kelso", location: "Colorado Springs, CO", initials: "GK", color: "#00FFFF" },
+            { name: "Rachel Scroggins", location: "Olathe, KS", initials: "RS", color: "#00008B" },
+            { name: "Jessica Stephens", location: "Frisco, TX", initials: "JS", color: "#008B8B" },
+            { name: "Mariann Oshana", location: "Tigard, OR", initials: "MO", color: "#B8860B" },
+            { name: "Jesse Kocher", location: "Jefferson County, CO", initials: "JK", color: "#A9A9A9" },
+            { name: "Olivia Hunsaker", location: "Golden, CO", initials: "OH", color: "#BDB76B" },
+            { name: "Jay Anderson", location: "Portland, OR", initials: "JA", color: "#8B008B" },
+            { name: "Abby Owens", location: "Gresham, OR", initials: "AO", color: "#556B2F" },
+            { name: "Bonnie Roberts", location: "Olathe, KS", initials: "BR", color: "#FF8C00" },
+            { name: "Ranjit Singh", location: "Irving, TX", initials: "RS", color: "#9932CC" },
+            { name: "Emily Touhey", location: "Waltham, MA", initials: "ET", color: "#8B0000" },
+            { name: "Emily Pettit", location: "Arlington, VA", initials: "EP", color: "#E9967A" },
+            { name: "David Gassaway", location: "Winston-Salem, NC", initials: "DG", color: "#8FBC8F" },
+            { name: "Jamie Garrett", location: "Portland, OR", initials: "JG", color: "#483D8B" },
+            { name: "Randi Fannon", location: "Durham, NC", initials: "RF", color: "#2F4F4F" },
+            { name: "Michele Serrao", location: "West Orange, NJ", initials: "MS", color: "#00CED1" },
+            { name: "Tamara Dixon", location: "Clearwater, FL", initials: "TD", color: "#9400D3" },
+            { name: "Danielle Marrone", location: "Bellevue, WA", initials: "DM", color: "#FF1493" },
+            { name: "Amie Kolesar", location: "Independence, MO", initials: "AK", color: "#00BFFF" },
+            { name: "Monica McClain", location: "Richmond, CA", initials: "MM", color: "#696969" },
+            { name: "Sarah Swanson", location: "Greenwood Village, CO", initials: "SS", color: "#1E90FF" },
+            { name: "Nicholas Brown", location: "Katy, TX", initials: "NB", color: "#B22222" },
+            { name: "Nai'a Newlight", location: "Anchorage, AK", initials: "NN", color: "#228B22" },
+            { name: "Melissa Higbee", location: "Jefferson County, CO", initials: "MH", color: "#FF00FF" },
+            { name: "Matt Nelson", location: "Ramsey County, MN", initials: "MN", color: "#FFD700" },
+            { name: "Alex Rice", location: "Flower Mound, TX", initials: "AR", color: "#DAA520" },
+            { name: "JR Hamilton", location: "Vancouver, WA", initials: "JH", color: "#CD5C5C" },
+            { name: "Kimberly Seldon", location: "Lancaster, TX", initials: "KS", color: "#4B0082" },
+            { name: "Dianna Rosenthal", location: "Richardson, TX", initials: "DR", color: "#F0E68C" },
+            { name: "Julie Jones", location: "San Antonio, TX", initials: "JJ", color: "#E6E6FA" },
+            { name: "Justin Harn", location: "King City, CA", initials: "JH", color: "#FFF0F5" },
+            { name: "Melissa Sauer", location: "Plymouth, MI", initials: "MS", color: "#7CFC00" },
+            { name: "Malia Lazu", location: "Boston, MA", initials: "ML", color: "#FFFACD" },
+            { name: "Kelsey Kornblatt", location: "Arlington, VA", initials: "KK", color: "#ADD8E6" },
+            { name: "Dave Stroud", location: "Aurora, CO", initials: "DS", color: "#F08080" },
+            { name: "Cory Fleming", location: "Rowlett, TX", initials: "CF", color: "#FAFAD2" },
+            { name: "Colin Watson", location: "West Melbourne, FL", initials: "CW", color: "#90EE90" },
+            { name: "Erik Schulz", location: "Wenatchee, WA", initials: "ES", color: "#FFB6C1" },
+            { name: "Chante Young", location: "Houston, TX", initials: "CY", color: "#FFA07A" },
+            { name: "Kelly Pierce", location: "Downers Grove, IL", initials: "KP", color: "#20B2AA" },
+            { name: "Colby Brusnahan", location: "Wellington, FL", initials: "CB", color: "#87CEFA" },
+            { name: "Jason Morado", location: "Austin, TX", initials: "JM", color: "#778899" },
+            { name: "Brianna Govoni", location: "Cambridge, MA", initials: "BG", color: "#B0C4DE" },
+            { name: "Jeffrey Jones", location: "Kansas City, MO", initials: "JJ", color: "#FFFFE0" },
+            { name: "Haley Bracewell", location: "Cibolo, TX", initials: "HB", color: "#00FF00" },
+            { name: "Kathryn Gauthier", location: "Austin, TX", initials: "KG", color: "#32CD32" },
+            { name: "Ariel Turner", location: "Buda, TX", initials: "AT", color: "#FAF0E6" },
+            { name: "Shawn Portillo", location: "Somerville, MA", initials: "SP", color: "#FF00FF" },
+            { name: "Leah Quinn", location: "Arvada, CO", initials: "LQ", color: "#800000" },
+            { name: "Kiri Sweeney", location: "Beaverton, OR", initials: "KS", color: "#66CDAA" },
+            { name: "Brittany Bennett", location: "Grand Rapids, MI", initials: "BB", color: "#0000CD" },
+            { name: "Jim Fargher", location: "Evanston, IL", initials: "JF", color: "#BA55D3" },
+            { name: "Daniel Valdez", location: "Leander, TX", initials: "DV", color: "#9370DB" },
+            { name: "Tobi Conley", location: "Seattle, WA", initials: "TC", color: "#3CB371" },
+            { name: "Brian Rimsza", location: "Phoenix, AZ", initials: "BR", color: "#7B68EE" },
+            { name: "Michael Valdivia", location: "Salinas, CA", initials: "MV", color: "#00FA9A" },
+            { name: "Bridget Hylton", location: "Chesterfield County, VA", initials: "BH", color: "#48D1CC" },
+            { name: "Chelsea Lee", location: "Parkland, FL", initials: "CL", color: "#C71585" },
+            { name: "Stephanie Chase", location: "Sunnyvale, CA", initials: "SC", color: "#191970" },
+            { name: "Patrick Malone", location: "Jefferson County, CO", initials: "PM", color: "#FF7F50" },
+            { name: "Katie Harger", location: "Boise, ID", initials: "KH", color: "#FF4500" },
+            { name: "Charles Alexander", location: "Charlotte, NC", initials: "CA", color: "#FFA500" },
+            { name: "Eric Peterson", location: "Coral Springs, FL", initials: "EP", color: "#FFD700" },
+            { name: "Stephanie McElroy", location: "Ypsilanti, MI", initials: "SM", color: "#DA70D6" }
+        ];
+
+        // Add influencers found tracking
+        gameState.influencersFound = [];
+        gameState.influencersOnMap = [];
         const specialCities = {
             // Tyler Major Offices - 50 points
             'plano': { type: 'tyler-major', points: 50, lat: 33.0198, lng: -96.6989 },
@@ -1162,11 +1436,194 @@
             // Load leaderboard
             updateLeaderboard();
             
+            // Spawn some influencers on the map!
+            spawnInfluencers();
+            
             // Position avatar at center of map
             if (gameState.googleMapsLoaded && gameState.map) {
                 positionAvatar(39.8283, -98.5795);
             }
         }
+
+        // Spawn ELGL Influencers on the map
+        function spawnInfluencers() {
+            const mapDiv = document.getElementById('googleMap');
+            
+            // Randomly select 15-20 influencers to spawn initially
+            const numInfluencers = 15 + Math.floor(Math.random() * 6);
+            const shuffled = [...elglInfluencers].sort(() => 0.5 - Math.random());
+            const selectedInfluencers = shuffled.slice(0, numInfluencers);
+            
+            selectedInfluencers.forEach((influencer, index) => {
+                setTimeout(() => {
+                    const avatar = createInfluencerAvatar(influencer);
+                    mapDiv.appendChild(avatar);
+                    gameState.influencersOnMap.push({
+                        element: avatar,
+                        data: influencer
+                    });
+                }, index * 200); // Stagger spawn for visual effect
+            });
+            
+            // Spawn new influencers periodically
+            setInterval(() => {
+                if (gameState.influencersOnMap.length < 25) {
+                    const remaining = elglInfluencers.filter(inf => 
+                        !gameState.influencersFound.includes(inf.name) &&
+                        !gameState.influencersOnMap.some(m => m.data.name === inf.name)
+                    );
+                    if (remaining.length > 0) {
+                        const newInfluencer = remaining[Math.floor(Math.random() * remaining.length)];
+                        const avatar = createInfluencerAvatar(newInfluencer);
+                        mapDiv.appendChild(avatar);
+                        gameState.influencersOnMap.push({
+                            element: avatar,
+                            data: newInfluencer
+                        });
+                    }
+                }
+            }, 30000); // Spawn new one every 30 seconds
+        }
+
+        // Create an influencer avatar
+        function createInfluencerAvatar(influencer) {
+            const avatar = document.createElement('div');
+            avatar.className = 'influencer-avatar';
+            avatar.style.left = Math.random() * 90 + '%';
+            avatar.style.top = Math.random() * 90 + '%';
+            
+            const head = document.createElement('div');
+            head.className = 'influencer-head';
+            head.style.background = influencer.color || '#' + Math.floor(Math.random()*16777215).toString(16);
+            head.textContent = influencer.initials;
+            
+            const body = document.createElement('div');
+            body.className = 'influencer-body';
+            
+            avatar.appendChild(head);
+            avatar.appendChild(body);
+            
+            // Click to find influencer
+            avatar.onclick = () => findInfluencer(influencer, avatar);
+            
+            // Random movement
+            moveInfluencerRandomly(avatar);
+            
+            return avatar;
+        }
+
+        // Move influencer randomly around the map
+        function moveInfluencerRandomly(avatar) {
+            setInterval(() => {
+                const currentLeft = parseFloat(avatar.style.left);
+                const currentTop = parseFloat(avatar.style.top);
+                
+                const newLeft = Math.max(0, Math.min(90, currentLeft + (Math.random() - 0.5) * 10));
+                const newTop = Math.max(0, Math.min(90, currentTop + (Math.random() - 0.5) * 10));
+                
+                avatar.style.left = newLeft + '%';
+                avatar.style.top = newTop + '%';
+            }, 5000 + Math.random() * 5000); // Move every 5-10 seconds
+        }
+
+        // Find an influencer
+        function findInfluencer(influencer, avatarElement) {
+            if (gameState.influencersFound.includes(influencer.name)) {
+                alert('You already found ' + influencer.name + '!');
+                return;
+            }
+            
+            // Add to found list
+            gameState.influencersFound.push(influencer.name);
+            
+            // Update counter
+            document.getElementById('influencerCount').textContent = gameState.influencersFound.length;
+            
+            // Add points
+            const points = 15; // 15 points for finding an influencer
+            gameState.score += points;
+            document.getElementById('scoreValue').textContent = gameState.score;
+            
+            // Show animation
+            showPointsAnimation(points);
+            
+            // Remove from map
+            avatarElement.style.animation = 'bounceOut 0.5s ease forwards';
+            setTimeout(() => {
+                avatarElement.remove();
+                gameState.influencersOnMap = gameState.influencersOnMap.filter(m => m.element !== avatarElement);
+            }, 500);
+            
+            // Show modal
+            document.getElementById('influencerName').textContent = influencer.name;
+            document.getElementById('influencerLocation').textContent = influencer.location;
+            document.getElementById('influencerModal').classList.add('show');
+            
+            // Update server
+            try {
+                fetch('/api/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        playerId: gameState.playerId,
+                        points: points,
+                        location: 'Found ' + influencer.name
+                    })
+                });
+                updateLeaderboard();
+            } catch (error) {
+                console.error('Score update failed:', error);
+            }
+            
+            // Special celebration if all found
+            if (gameState.influencersFound.length === elglInfluencers.length) {
+                setTimeout(() => {
+                    alert('🎉 INCREDIBLE! You found ALL 105 ELGL Influencers! +500 BONUS POINTS! 🎉');
+                    gameState.score += 500;
+                    document.getElementById('scoreValue').textContent = gameState.score;
+                    createMegaConfetti();
+                }, 1000);
+            }
+        }
+
+        // Close influencer modal
+        function closeInfluencerModal() {
+            document.getElementById('influencerModal').classList.remove('show');
+            createConfetti();
+        }
+
+        // Create mega confetti for finding all influencers
+        function createMegaConfetti() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#27ae60', '#9b59b6', '#e67e22', '#1abc9c'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = '15px';
+                    confetti.style.height = '15px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-15px';
+                    confetti.style.zIndex = '3000';
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.animation = 'fall 4s linear forwards';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 20);
+            }
+        }
+
+        // Add bounce out animation
+        const influencerStyle = document.createElement('style');
+        influencerStyle.textContent = `
+            @keyframes bounceOut {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.5); opacity: 0.5; }
+                100% { transform: scale(0); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(influencerStyle);
 
         // Search for location
         async function searchLocation() {
