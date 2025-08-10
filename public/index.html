@@ -1254,44 +1254,103 @@
             try {
                 // Try multiple image sources for real city hall photos
                 if (gameState.googleMapsLoaded && gameState.placesService) {
-                    // Search for city hall using Places API
-                    const request = {
-                        query: `${cityName} city hall`,
-                        fields: ['photos', 'name', 'formatted_address']
-                    };
+                    // Search for city hall using Places API with more specific queries
+                    const searchQueries = [
+                        `${cityName} city hall`,
+                        `${cityName} town hall`,
+                        `${cityName} municipal building`,
+                        `${cityName} government center`,
+                        `${cityName} civic center`,
+                        `${cityName} county administration building`
+                    ];
                     
-                    gameState.placesService.findPlaceFromQuery(request, (results, status) => {
-                        if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0]) {
-                            if (results[0].photos && results[0].photos.length > 0) {
-                                const photoUrl = results[0].photos[0].getUrl({
-                                    maxWidth: 600,
-                                    maxHeight: 400
-                                });
-                                document.getElementById('selfieBackground').style.backgroundImage = `url(${photoUrl})`;
-                                return;
-                            }
-                        }
-                        // Fallback to Unsplash if Google Places doesn't have photos
-                        useFallbackImage(cityName);
-                    });
+                    let photoFound = false;
+                    
+                    // Try each query until we find a photo
+                    for (const query of searchQueries) {
+                        if (photoFound) break;
+                        
+                        await new Promise((resolve) => {
+                            const request = {
+                                query: query,
+                                fields: ['photos', 'name', 'formatted_address', 'types']
+                            };
+                            
+                            gameState.placesService.findPlaceFromQuery(request, (results, status) => {
+                                if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                                    // Filter for actual government buildings
+                                    const govBuilding = results.find(place => {
+                                        if (!place.types) return false;
+                                        const govTypes = ['city_hall', 'local_government_office', 'courthouse', 'town_hall'];
+                                        return place.types.some(type => govTypes.includes(type));
+                                    }) || results[0];
+                                    
+                                    if (govBuilding && govBuilding.photos && govBuilding.photos.length > 0) {
+                                        const photoUrl = govBuilding.photos[0].getUrl({
+                                            maxWidth: 600,
+                                            maxHeight: 400
+                                        });
+                                        document.getElementById('selfieBackground').style.backgroundImage = `url(${photoUrl})`;
+                                        photoFound = true;
+                                    }
+                                }
+                                resolve();
+                            });
+                        });
+                    }
+                    
+                    if (!photoFound) {
+                        // If no photo found via Places API, use curated fallback
+                        useCuratedCityHallImage(cityName);
+                    }
                 } else {
                     // Use fallback image service
-                    useFallbackImage(cityName);
+                    useCuratedCityHallImage(cityName);
                 }
                 
             } catch (error) {
                 console.error('Image search failed:', error);
+                useCuratedCityHallImage(cityName);
+            }
+        }
+        
+        // Curated city hall images for special cities
+        function useCuratedCityHallImage(cityName) {
+            const cityLower = cityName.toLowerCase();
+            
+            // Curated images for cities where Google Places might not work well
+            const curatedImages = {
+                'yarmouth': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Yarmouth_Town_Hall%2C_Maine.jpg/800px-Yarmouth_Town_Hall%2C_Maine.jpg',
+                'plano': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Plano_Municipal_Center.jpg/800px-Plano_Municipal_Center.jpg',
+                'denver': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Denver_City_and_County_Building.JPG/800px-Denver_City_and_County_Building.JPG',
+                'thornton': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Thornton_City_Hall.jpg/800px-Thornton_City_Hall.jpg'
+            };
+            
+            if (curatedImages[cityLower]) {
+                // Use curated image
+                const img = new Image();
+                img.onload = function() {
+                    document.getElementById('selfieBackground').style.backgroundImage = `url(${img.src})`;
+                };
+                img.onerror = function() {
+                    // If curated image fails, use generic fallback
+                    useFallbackImage(cityName);
+                };
+                img.src = curatedImages[cityLower];
+            } else {
+                // Use generic search fallback
                 useFallbackImage(cityName);
             }
         }
         
         // Fallback image function
         function useFallbackImage(cityName) {
-            // Try multiple image sources
+            // Try multiple image sources with more specific queries
             const imageUrls = [
-                `https://source.unsplash.com/600x400/?${encodeURIComponent(cityName)},city-hall,government`,
-                `https://loremflickr.com/600/400/${encodeURIComponent(cityName)},cityhall,government/all`,
-                `https://picsum.photos/600/400?random=${encodeURIComponent(cityName)}`
+                `https://source.unsplash.com/600x400/?${encodeURIComponent(cityName)}-city-hall,government-building,municipal`,
+                `https://source.unsplash.com/600x400/?city-hall,${encodeURIComponent(cityName)},civic-center`,
+                `https://source.unsplash.com/600x400/?government-building,${encodeURIComponent(cityName)}`,
+                `https://loremflickr.com/600/400/cityhall,government,${encodeURIComponent(cityName)}/all`
             ];
             
             // Try to load the first working image
@@ -1303,9 +1362,9 @@
                     img.src = imageUrls[currentIndex];
                     currentIndex++;
                 } else {
-                    // Use default city hall if all fail
+                    // Use default generic city hall if all fail
                     document.getElementById('selfieBackground').style.backgroundImage = 
-                        'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjIwMCIgeT0iMTUwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDE1MCAzMDAsMTAwIDQwMCwxNTAiIGZpbGw9IiM4YjQ1MTMiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2MCI+8J+PmzwvdGV4dD4KPC9zdmc+)';
+                        'url(https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/US-Government-Capitol.jpg/800px-US-Government-Capitol.jpg)';
                 }
             }
             
