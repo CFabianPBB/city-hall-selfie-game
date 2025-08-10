@@ -34,6 +34,12 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// NEW ROUTE: Serve Google Maps API Key securely
+app.get('/api/google-maps-key', (req, res) => {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_PLACEHOLDER';
+    res.json({ key: apiKey });
+});
+
 // Register new player
 app.post('/api/register', async (req, res) => {
     const { name, email, photo } = req.body;
@@ -127,4 +133,6 @@ app.post('/api/city', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Google Maps API Key configured: ${process.env.GOOGLE_MAPS_API_KEY ? 'Yes' : 'No'}`);
 });

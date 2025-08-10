@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Hall Selfie - The Game! | ELGL 10th Anniversary</title>
     
-    <!-- Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <!-- NO API KEY HERE - Will be loaded dynamically -->
     
     <!-- SimCity-style Font -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -753,7 +752,7 @@
             color: #f1c40f;
         }
 
-        /* Loading Spinner */
+        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -985,7 +984,8 @@
             map: null,
             markers: [],
             geocoder: null,
-            placesService: null
+            placesService: null,
+            googleMapsLoaded: false
         };
 
         // Special Cities Database - Expanded!
@@ -1028,8 +1028,37 @@
             'scottsdale': { type: 'pbb', points: 25, lat: 33.4942, lng: -111.9261 }
         };
 
+        // Load Google Maps API dynamically and securely
+        async function loadGoogleMapsAPI() {
+            try {
+                // Fetch the API key from the server
+                const response = await fetch('/api/google-maps-key');
+                const data = await response.json();
+                
+                if (data.key && data.key !== 'YOUR_API_KEY_PLACEHOLDER') {
+                    // Create and load the Google Maps script
+                    const script = document.createElement('script');
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&libraries=places&callback=initMap`;
+                    script.async = true;
+                    script.defer = true;
+                    script.onerror = function() {
+                        console.error('Failed to load Google Maps');
+                        gameState.googleMapsLoaded = false;
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    console.log('Google Maps API key not configured');
+                    gameState.googleMapsLoaded = false;
+                }
+            } catch (error) {
+                console.error('Failed to fetch API key:', error);
+                gameState.googleMapsLoaded = false;
+            }
+        }
+
         // Initialize Google Map
         function initMap() {
+            gameState.googleMapsLoaded = true;
             gameState.map = new google.maps.Map(document.getElementById('googleMap'), {
                 zoom: 3,
                 center: { lat: 39.8283, lng: -98.5795 }, // Center of USA
@@ -1061,6 +1090,9 @@
             gameState.placesService = new google.maps.places.PlacesService(gameState.map);
         }
 
+        // Make initMap globally accessible for Google Maps callback
+        window.initMap = initMap;
+
         // Photo Upload Handler
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
@@ -1085,11 +1117,6 @@
             if (!gameState.playerPhoto) {
                 alert('Please upload your photo!');
                 return;
-            }
-
-            // Initialize map if not already done
-            if (!gameState.map) {
-                initMap();
             }
 
             // Register player
@@ -1126,7 +1153,9 @@
             updateLeaderboard();
             
             // Position avatar at center of map
-            positionAvatar(39.8283, -98.5795);
+            if (gameState.googleMapsLoaded && gameState.map) {
+                positionAvatar(39.8283, -98.5795);
+            }
         }
 
         // Search for location
@@ -1144,55 +1173,68 @@
             const cityLower = searchInput.toLowerCase();
             const specialCity = specialCities[cityLower];
 
-            // Geocode the location
-            gameState.geocoder.geocode({ address: searchInput }, async (results, status) => {
-                if (status === 'OK' && results[0]) {
-                    const location = results[0].geometry.location;
-                    const lat = location.lat();
-                    const lng = location.lng();
-                    
-                    // Store current city info
-                    gameState.currentCity = {
-                        name: results[0].formatted_address,
-                        lat: lat,
-                        lng: lng,
-                        type: specialCity ? specialCity.type : 'regular',
-                        points: specialCity ? specialCity.points : 5
-                    };
+            if (gameState.googleMapsLoaded && gameState.geocoder) {
+                // Geocode the location
+                gameState.geocoder.geocode({ address: searchInput }, async (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        const location = results[0].geometry.location;
+                        const lat = location.lat();
+                        const lng = location.lng();
+                        
+                        // Store current city info
+                        gameState.currentCity = {
+                            name: results[0].formatted_address,
+                            lat: lat,
+                            lng: lng,
+                            type: specialCity ? specialCity.type : 'regular',
+                            points: specialCity ? specialCity.points : 5
+                        };
 
-                    // Move map to location
-                    gameState.map.setCenter(location);
-                    gameState.map.setZoom(15);
+                        // Move map to location
+                        gameState.map.setCenter(location);
+                        gameState.map.setZoom(15);
 
-                    // Add marker
-                    const marker = new google.maps.Marker({
-                        position: location,
-                        map: gameState.map,
-                        icon: {
-                            url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjAiIHk9IjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn4+bPC90ZXh0Pgo8L3N2Zz4=',
-                            scaledSize: new google.maps.Size(40, 40)
-                        },
-                        animation: google.maps.Animation.DROP
-                    });
+                        // Add marker
+                        const marker = new google.maps.Marker({
+                            position: location,
+                            map: gameState.map,
+                            icon: {
+                                url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjAiIHk9IjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn4+bPC90ZXh0Pgo8L3N2Zz4=',
+                                scaledSize: new google.maps.Size(40, 40)
+                            },
+                            animation: google.maps.Animation.DROP
+                        });
 
-                    gameState.markers.push(marker);
+                        gameState.markers.push(marker);
 
-                    // Animate avatar to location
-                    await animateAvatarToLocation(lat, lng);
+                        // Animate avatar to location
+                        await animateAvatarToLocation(lat, lng);
 
-                    // Search for city hall image
-                    await searchCityHallImage(searchInput);
+                        // Search for city hall image
+                        await searchCityHallImage(searchInput);
 
-                    hideLoading();
+                        hideLoading();
 
-                    // Show selfie modal
-                    setTimeout(() => showSelfieModal(), 500);
+                        // Show selfie modal
+                        setTimeout(() => showSelfieModal(), 500);
 
-                } else {
-                    hideLoading();
-                    alert('Could not find that city. Try another name!');
-                }
-            });
+                    } else {
+                        hideLoading();
+                        alert('Could not find that city. Try another name!');
+                    }
+                });
+            } else {
+                // Fallback without Google Maps
+                gameState.currentCity = {
+                    name: searchInput,
+                    type: specialCity ? specialCity.type : 'regular',
+                    points: specialCity ? specialCity.points : 5
+                };
+                
+                await searchCityHallImage(searchInput);
+                hideLoading();
+                showSelfieModal();
+            }
 
             document.getElementById('locationSearch').value = '';
         }
@@ -1201,23 +1243,7 @@
         async function searchCityHallImage(cityName) {
             try {
                 // Try multiple image sources for real city hall photos
-                const imageSearches = [
-                    // Wikimedia Commons search for city halls
-                    `https://commons.wikimedia.org/wiki/Special:Search?search=${encodeURIComponent(cityName)}+city+hall&title=Special:Search&profile=default&fulltext=1`,
-                    
-                    // Unsplash with specific city hall query
-                    `https://source.unsplash.com/600x400/?${encodeURIComponent(cityName)}-city-hall,government-building,civic-center`,
-                    
-                    // Pexels API (would need API key)
-                    `https://images.pexels.com/photos/search/?query=${encodeURIComponent(cityName)}+city+hall`,
-                    
-                    // Bing Image Search (would need API key)
-                    `https://api.bing.microsoft.com/v7.0/images/search?q=${encodeURIComponent(cityName)}+city+hall+building`
-                ];
-                
-                // For production, you'd want to use Google Custom Search API
-                // Here's how you'd implement it with your Google API key:
-                if (window.google && google.maps && gameState.placesService) {
+                if (gameState.googleMapsLoaded && gameState.placesService) {
                     // Search for city hall using Places API
                     const request = {
                         query: `${cityName} city hall`,
@@ -1291,7 +1317,9 @@
                 avatar.classList.add('walking');
                 
                 // Position avatar on map
-                positionAvatar(lat, lng);
+                if (gameState.googleMapsLoaded) {
+                    positionAvatar(lat, lng);
+                }
                 
                 setTimeout(() => {
                     avatar.classList.remove('walking');
@@ -1503,16 +1531,11 @@
             document.getElementById('loadingOverlay').classList.remove('show');
         }
 
-        // Initialize map on load
-        window.onload = function() {
-            // Initialize Google Maps
-            if (typeof google !== 'undefined') {
-                initMap();
-            } else {
-                console.log('Google Maps not loaded. Add your API key.');
-                // Fallback to static map
-            }
-        };
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            // Load Google Maps API securely
+            loadGoogleMapsAPI();
+        });
 
         // Auto-refresh leaderboard
         setInterval(() => {
@@ -1533,23 +1556,6 @@
                 });
             }
         });
-    </script>
-
-    <!-- Initialize Google Maps -->
-    <script>
-        // Note: Replace YOUR_API_KEY with actual Google Maps API key
-        function loadGoogleMaps() {
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=YOURAPIKEY&libraries=places&callback=initMap';
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
-        }
-        
-        // For demo without API key, use fallback
-        if (!window.location.href.includes('localhost')) {
-            loadGoogleMaps(); // Now active with API key
-        }
     </script>
 </body>
 </html>
