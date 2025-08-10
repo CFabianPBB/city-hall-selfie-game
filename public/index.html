@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Hall Selfie - The Game!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8C8 100%);
+        }
+
+        /* Start Screen */
+        #startScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .start-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .game-title {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .elgl-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload label {
+            display: block;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-upload label:hover {
+            background: #e0e0ff;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Game Container */
+        #gameContainer {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* SimCity Style Map */
+        #worldMap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #6B8E23;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.1) 40px, rgba(255,255,255,0.1) 41px),
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.1) 40px, rgba(255,255,255,0.1) 41px);
+        }
+
+        /* Isometric Buildings */
+        .building {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .building:hover {
+            transform: scale(1.1) translateY(-5px);
+        }
+
+        .city-hall {
+            width: 60px;
+            height: 80px;
+        }
+
+        .city-hall-base {
+            width: 60px;
+            height: 40px;
+            background: #8B7355;
+            transform: rotateX(60deg) rotateZ(45deg);
+            position: absolute;
+            bottom: 0;
+        }
+
+        .city-hall-building {
+            width: 50px;
+            height: 60px;
+            background: linear-gradient(180deg, #CD853F 0%, #8B7355 100%);
+            position: absolute;
+            bottom: 20px;
+            left: 5px;
+            border: 2px solid #654321;
+        }
+
+        .city-hall-building::before {
+            content: '🏛️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .city-hall-roof {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 20px solid #8B4513;
+            position: absolute;
+            top: -20px;
+            left: -5px;
+        }
+
+        /* Avatar (JibJab Style) */
+        #avatar {
+            position: absolute;
+            width: 70px;
+            height: 100px;
+            transition: all 0.5s ease;
+            z-index: 50;
+            cursor: grab;
+        }
+
+        #avatar.walking {
+            animation: walk 0.5s infinite;
+        }
+
+        @keyframes walk {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-5px) rotate(5deg); }
+        }
+
+        .avatar-head {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .avatar-body {
+            width: 40px;
+            height: 45px;
+            background: #4169E1;
+            margin: -10px auto 0;
+            border-radius: 20px 20px 10px 10px;
+            position: relative;
+        }
+
+        .avatar-arms {
+            position: absolute;
+            width: 60px;
+            height: 8px;
+            background: #4169E1;
+            top: 10px;
+            left: -10px;
+            border-radius: 4px;
+        }
+
+        .avatar-legs {
+            position: absolute;
+            bottom: -20px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .avatar-legs::before,
+        .avatar-legs::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: #333;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .avatar-legs::before { left: 0; }
+        .avatar-legs::after { right: 0; }
+
+        /* Control Panel */
+        .control-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 300px;
+        }
+
+        .go-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00C851 0%, #00AA44 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .go-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 200, 81, 0.4);
+        }
+
+        /* Score Display */
+        .score-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .score-label {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .leaderboard h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.4em;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-entry:hover {
+            background: linear-gradient(135deg, #e8e8ff 0%, #d8d8ff 100%);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-entry.gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .leaderboard-entry.silver { background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%); }
+        .leaderboard-entry.bronze { background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%); }
+
+        .rank {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 15px;
+            font-size: 1.2em;
+            width: 30px;
+        }
+
+        .player-name {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .player-score {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1.1em;
+        }
+
+        /* Logo Queue */
+        .logo-queue {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .logo-item {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounceIn 0.5s ease;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .logo-item.tyler {
+            background: linear-gradient(135deg, #0066CC 0%, #004499 100%);
+            color: white;
+        }
+
+        .logo-item.resourcex {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A24 100%);
+            color: white;
+        }
+
+        /* Selfie Modal */
+        .selfie-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selfie-modal.show {
+            display: flex;
+        }
+
+        .selfie-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .selfie-title {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .selfie-preview {
+            position: relative;
+            width: 500px;
+            height: 350px;
+            margin: 20px auto;
+            border: 5px solid #667eea;
+            border-radius: 10px;
+            overflow: hidden;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjE1MCIgeT0iMTAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTUwLDEwMCAyNTAsMzAgMzUwLDEwMCIgZmlsbD0iIzhiNDUxMyIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYwIj7wn4+bPC90ZXh0Pgo8L3N2Zz4=') center/cover;
+        }
+
+        .selfie-person {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 150px;
+        }
+
+        .selfie-person-head {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto;
+            border: 4px solid white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .selfie-person-body {
+            width: 60px;
+            height: 70px;
+            background: #4169E1;
+            margin: -20px auto 0;
+            border-radius: 30px 30px 10px 10px;
+        }
+
+        .selfie-watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #00C851 0%, #00AA44 100%);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-btn.linkedin {
+            background: #0077b5;
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Points Popup */
+        .points-popup {
+            position: absolute;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.8em;
+            z-index: 200;
+            animation: floatUp 2s ease forwards;
+            pointer-events: none;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-50px) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120px) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            top: 120px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 250px;
+            font-size: 14px;
+            z-index: 100;
+        }
+
+        .instructions h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <div class="start-container">
+            <h1 class="game-title">🏛️ City Hall Selfie</h1>
+            <div class="elgl-badge">ELGL's City Hall Selfie Day</div>
+            
+            <form id="startForm" onsubmit="startGame(event)">
+                <div class="form-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" required placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="playerEmail">Your Email:</label>
+                    <input type="email" id="playerEmail" required placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Your Photo (for your avatar):</label>
+                    <div class="file-upload">
+                        <input type="file" id="photoUpload" accept="image/*" required onchange="handlePhotoUpload(event)">
+                        <label for="photoUpload" id="photoLabel">
+                            📸 Click to upload your photo
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="start-btn" id="startBtn" disabled>Start Playing!</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer">
+        <!-- World Map -->
+        <div id="worldMap">
+            <div class="map-grid"></div>
+            
+            <!-- Avatar -->
+            <div id="avatar" style="top: 50%; left: 50%;">
+                <div class="avatar-head" id="avatarHead"></div>
+                <div class="avatar-body">
+                    <div class="avatar-arms"></div>
+                    <div class="avatar-legs"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Display -->
+        <div class="score-display">
+            <div class="score-label">Your Score</div>
+            <div class="score-value" id="scoreValue">0</div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h4>How to Play:</h4>
+            <ul>
+                <li>Enter a city name</li>
+                <li>Watch your avatar travel</li>
+                <li>Take selfies at City Halls</li>
+                <li>Special bonuses for Tyler & ResourceX cities!</li>
+            </ul>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+            <h3>🏆 Top Players</h3>
+            <div id="leaderboardList">
+                <div class="leaderboard-entry">
+                    <span class="rank">#1</span>
+                    <span class="player-name">Waiting for players...</span>
+                    <span class="player-score">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Queue -->
+        <div class="logo-queue" id="logoQueue"></div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="search-box">
+                <input type="text" id="locationSearch" placeholder="Enter a city name (e.g., Denver, Plano, Washington)">
+                <button class="go-btn" onclick="searchLocation()">🚀 Travel There!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selfie Modal -->
+    <div class="selfie-modal" id="selfieModal">
+        <div class="selfie-content">
+            <h2 class="selfie-title">📸 City Hall Selfie Time!</h2>
+            <div class="selfie-preview">
+                <div class="selfie-person" id="selfiePerson">
+                    <div class="selfie-person-head" id="selfiePersonHead"></div>
+                    <div class="selfie-person-body"></div>
+                </div>
+                <div class="selfie-watermark">City Hall Selfie Day 2024</div>
+            </div>
+            <p id="locationName" style="font-size: 1.2em; color: #667eea; margin-bottom: 20px;"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="takeSelfie()">📸 Snap Photo!</button>
+                <button class="modal-btn linkedin" onclick="shareToLinkedIn()">🔗 Share on LinkedIn</button>
+                <button class="modal-btn secondary" onclick="closeSelfieModal()">Keep Exploring</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="data:audio/mpeg;base64,SUQzAwAAAAAAIVRYWFgAAAANAAAAU29mdHdhcmUAR2FyYWdlQmFuZABUWFhYAAAADwAAAGNvbW1lbnQAQ29tbWVudAD/80DEAAAAA0gAAAAATEFNRTMuOTlyAQAB">
+    </audio>
+
+    <script>
+        // Game State
+        let gameState = {
+            playerId: null,
+            playerName: '',
+            playerEmail: '',
+            playerPhoto: null,
+            score: 0,
+            currentCity: null,
+            logos: [],
+            isMoving: false
+        };
+
+        // City Database with coordinates
+        const cityDatabase = {
+            'denver': { x: 25, y: 40, type: 'pbb', points: 25, name: 'Denver, CO' },
+            'plano': { x: 30, y: 55, type: 'tyler-major', points: 50, name: 'Plano, TX' },
+            'yarmouth': { x: 70, y: 35, type: 'tyler-major', points: 50, name: 'Yarmouth, ME' },
+            'washington': { x: 68, y: 42, type: 'capital', points: 5, name: 'Washington, DC' },
+            'austin': { x: 28, y: 58, type: 'tyler', points: 10, name: 'Austin, TX' },
+            'chicago': { x: 55, y: 38, type: 'regular', points: 5, name: 'Chicago, IL' },
+            'seattle': { x: 12, y: 30, type: 'regular', points: 5, name: 'Seattle, WA' },
+            'miami': { x: 65, y: 70, type: 'regular', points: 5, name: 'Miami, FL' },
+            'boston': { x: 72, y: 37, type: 'regular', points: 5, name: 'Boston, MA' },
+            'phoenix': { x: 20, y: 52, type: 'regular', points: 5, name: 'Phoenix, AZ' },
+            'portland': { x: 10, y: 32, type: 'pbb', points: 25, name: 'Portland, OR' },
+            'sacramento': { x: 8, y: 42, type: 'regular', points: 5, name: 'Sacramento, CA' },
+            'atlanta': { x: 58, y: 52, type: 'regular', points: 5, name: 'Atlanta, GA' }
+        };
+
+        // Photo Upload Handler
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gameState.playerPhoto = e.target.result;
+                    document.getElementById('photoLabel').innerHTML = '✅ Photo uploaded!';
+                    document.getElementById('startBtn').disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Start Game
+        async function startGame(event) {
+            event.preventDefault();
+            
+            gameState.playerName = document.getElementById('playerName').value;
+            gameState.playerEmail = document.getElementById('playerEmail').value;
+            
+            if (!gameState.playerPhoto) {
+                alert('Please upload your photo to create your avatar!');
+                return;
+            }
+
+            // Register player
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: gameState.playerName,
+                        email: gameState.playerEmail,
+                        photo: gameState.playerPhoto
+                    })
+                });
+                
+                const data = await response.json();
+                gameState.playerId = data.player.id;
+                
+                // Set avatar photo
+                document.getElementById('avatarHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
+                document.getElementById('selfiePersonHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
+                
+                // Start game
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('gameContainer').style.display = 'block';
+                
+                // Play background music
+                document.getElementById('bgMusic').play().catch(e => console.log('Audio play failed'));
+                
+                // Load leaderboard
+                updateLeaderboard();
+                
+                // Add initial buildings
+                initializeBuildings();
+                
+            } catch (error) {
+                console.error('Registration failed:', error);
+                alert('Failed to register. The game will work offline!');
+                
+                // Offline mode
+                gameState.playerId = 'offline_' + Date.now();
+                document.getElementById('avatarHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
+                document.getElementById('selfiePersonHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('gameContainer').style.display = 'block';
+                initializeBuildings();
+            }
+        }
+
+        // Initialize Buildings on Map
+        function initializeBuildings() {
+            const worldMap = document.getElementById('worldMap');
+            
+            Object.keys(cityDatabase).forEach(cityKey => {
+                const city = cityDatabase[cityKey];
+                const building = document.createElement('div');
+                building.className = 'building city-hall';
+                building.style.left = city.x + '%';
+                building.style.top = city.y + '%';
+                building.onclick = () => travelToCity(cityKey);
+                
+                building.innerHTML = `
+                    <div class="city-hall-roof"></div>
+                    <div class="city-hall-building"></div>
+                    <div class="city-hall-base"></div>
+                `;
+                
+                worldMap.appendChild(building);
+            });
+        }
+
+        // Search Location
+        function searchLocation() {
+            const searchInput = document.getElementById('locationSearch').value.toLowerCase().trim();
+            if (!searchInput) {
+                alert('Please enter a city name!');
+                return;
+            }
+            
+            // Check if city exists in database
+            if (cityDatabase[searchInput]) {
+                travelToCity(searchInput);
+            } else {
+                // Create random city
+                const randomCity = {
+                    x: 10 + Math.random() * 80,
+                    y: 10 + Math.random() * 80,
+                    type: 'regular',
+                    points: 5,
+                    name: searchInput.charAt(0).toUpperCase() + searchInput.slice(1)
+                };
+                cityDatabase[searchInput] = randomCity;
+                
+                // Add building to map
+                const worldMap = document.getElementById('worldMap');
+                const building = document.createElement('div');
+                building.className = 'building city-hall';
+                building.style.left = randomCity.x + '%';
+                building.style.top = randomCity.y + '%';
+                building.onclick = () => travelToCity(searchInput);
+                
+                building.innerHTML = `
+                    <div class="city-hall-roof"></div>
+                    <div class="city-hall-building"></div>
+                    <div class="city-hall-base"></div>
+                `;
+                
+                worldMap.appendChild(building);
+                travelToCity(searchInput);
+            }
+            
+            document.getElementById('locationSearch').value = '';
+        }
+
+        // Travel to City
+        function travelToCity(cityKey) {
+            if (gameState.isMoving) return;
+            
+            const city = cityDatabase[cityKey];
+            gameState.currentCity = city;
+            gameState.isMoving = true;
+            
+            const avatar = document.getElementById('avatar');
+            avatar.classList.add('walking');
+            
+            // Animate avatar movement
+            avatar.style.left = city.x + '%';
+            avatar.style.top = city.y + '%';
+            
+            setTimeout(() => {
+                avatar.classList.remove('walking');
+                gameState.isMoving = false;
+                showSelfieModal(city);
+            }, 1500);
+        }
+
+        // Show Selfie Modal
+        function showSelfieModal(city) {
+            const modal = document.getElementById('selfieModal');
+            const locationName = document.getElementById('locationName');
+            
+            locationName.textContent = `📍 ${city.name}`;
+            
+            // Add special effects for special locations
+            if (city.type === 'tyler-major') {
+                locationName.innerHTML += ' <span style="color: #0066CC;">🏢 Tyler Technologies HQ!</span>';
+            } else if (city.type === 'tyler') {
+                locationName.innerHTML += ' <span style="color: #0066CC;">🏢 Tyler Office</span>';
+            } else if (city.type === 'pbb') {
+                locationName.innerHTML += ' <span style="color: #FF6B6B;">💰 Priority Based Budgeting City!</span>';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        // Take Selfie
+        async function takeSelfie() {
+            const city = gameState.currentCity;
+            let points = city.points;
+            
+            // Show points animation
+            showPointsAnimation(points);
+            
+            // Update score
+            gameState.score += points;
+            document.getElementById('scoreValue').textContent = gameState.score;
+            
+            // Add logos if special location
+            if (city.type === 'tyler' || city.type === 'tyler-major') {
+                addLogo('tyler', 'T');
+            }
+            if (city.type === 'pbb') {
+                addLogo('resourcex', 'RX');
+            }
+            
+            // Update server
+            try {
+                const response = await fetch('/api/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        playerId: gameState.playerId,
+                        points: points,
+                        location: city.name
+                    })
+                });
+                
+                const data = await response.json();
+                updateLeaderboard();
+            } catch (error) {
+                console.error('Score update failed:', error);
+            }
+            
+            closeSelfieModal();
+            
+            // Celebration effect
+            createConfetti();
+        }
+
+        // Show Points Animation
+        function showPointsAnimation(points) {
+            const avatar = document.getElementById('avatar');
+            const popup = document.createElement('div');
+            popup.className = 'points-popup';
+            popup.textContent = `+${points} points!`;
+            popup.style.left = avatar.style.left;
+            popup.style.top = avatar.style.top;
+            
+            document.getElementById('worldMap').appendChild(popup);
+            
+            setTimeout(() => popup.remove(), 2000);
+        }
+
+        // Add Logo
+        function addLogo(type, text) {
+            const logoQueue = document.getElementById('logoQueue');
+            const logo = document.createElement('div');
+            logo.className = `logo-item ${type}`;
+            logo.textContent = text;
+            logoQueue.appendChild(logo);
+            
+            // Remove after 10 seconds
+            setTimeout(() => logo.remove(), 10000);
+        }
+
+        // Create Confetti
+        function createConfetti() {
+            const colors = ['#FFD700', '#FF6B6B', '#667eea', '#00C851', '#0066CC'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.zIndex = '1000';
+                    confetti.style.animation = 'fall 3s linear forwards';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // Add falling animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Update Leaderboard
+        async function updateLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                const leaderboard = await response.json();
+                
+                const leaderboardList = document.getElementById('leaderboardList');
+                leaderboardList.innerHTML = '';
+                
+                leaderboard.forEach((player, index) => {
+                    const entry = document.createElement('div');
+                    entry.className = 'leaderboard-entry';
+                    if (index === 0) entry.classList.add('gold');
+                    if (index === 1) entry.classList.add('silver');
+                    if (index === 2) entry.classList.add('bronze');
+                    
+                    entry.innerHTML = `
+                        <span class="rank">#${index + 1}</span>
+                        <span class="player-name">${player.name}</span>
+                        <span class="player-score">${player.score}</span>
+                    `;
+                    
+                    leaderboardList.appendChild(entry);
+                });
+                
+                if (leaderboard.length === 0) {
+                    leaderboardList.innerHTML = '<div class="leaderboard-entry"><span class="player-name">No players yet...</span></div>';
+                }
+            } catch (error) {
+                console.error('Leaderboard update failed:', error);
+            }
+        }
+
+        // Share to LinkedIn
+        function shareToLinkedIn() {
+            const text = `🏛️ I just scored ${gameState.score} points in the City Hall Selfie Game! Join me for ELGL's City Hall Selfie Day and see if you can beat my score! #CityHallSelfie #ELGL #LocalGov`;
+            const url = window.location.href;
+            
+            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        }
+
+        // Close Selfie Modal
+        function closeSelfieModal() {
+            document.getElementById('selfieModal').classList.remove('show');
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('gameContainer').style.display === 'block') {
+                searchLocation();
+            }
+        });
+
+        // Auto-refresh leaderboard every 30 seconds
+        setInterval(() => {
+            if (document.getElementById('gameContainer').style.display === 'block') {
+                updateLeaderboard();
+            }
+        }, 30000);
+
+        // Prevent form submission on enter in search box
+        document.getElementById('locationSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchLocation();
+            }
+        });
+    </script>
+</body>
+</html>
