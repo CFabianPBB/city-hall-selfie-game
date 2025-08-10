@@ -1400,6 +1400,11 @@
 
             gameState.geocoder = new google.maps.Geocoder();
             gameState.placesService = new google.maps.places.PlacesService(gameState.map);
+            
+            // Spawn city pins AFTER map is ready
+            setTimeout(() => {
+                spawnCityPins();
+            }, 1000);
         }
 
         // Make initMap globally accessible for Google Maps callback
@@ -1466,9 +1471,6 @@
             
             // Spawn some influencers on the map!
             spawnInfluencers();
-            
-            // Spawn city pins for Tyler and PBB cities
-            spawnCityPins();
             
             // Load community selfies
             loadCommunitySelfies();
