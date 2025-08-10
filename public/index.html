@@ -802,66 +802,72 @@
             50% { opacity: 0.5; }
         }
 
-        /* Influencer Avatars */
+        /* Influencer Avatars - More Visible! */
         .influencer-avatar {
             position: absolute;
-            width: 40px;
-            height: 50px;
-            z-index: 50;
+            width: 50px;
+            height: 65px;
+            z-index: 75;
             cursor: pointer;
-            transition: all 0.3s;
-            animation: influencerWalk 20s linear infinite;
-        }
-
-        @keyframes influencerWalk {
-            0% { transform: translateX(0) translateY(0); }
-            25% { transform: translateX(30px) translateY(-20px); }
-            50% { transform: translateX(-20px) translateY(30px); }
-            75% { transform: translateX(40px) translateY(20px); }
-            100% { transform: translateX(0) translateY(0); }
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
         .influencer-avatar:hover {
-            transform: scale(1.2);
-            z-index: 60;
+            transform: scale(1.3);
+            z-index: 100;
         }
 
         .influencer-head {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
+            font-size: 12px;
             color: white;
             font-weight: bold;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.5);
+            border: 3px solid white;
             position: relative;
+            animation: bob 3s ease-in-out infinite;
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .influencer-head::after {
             content: '✨';
             position: absolute;
-            top: -10px;
-            right: -5px;
-            font-size: 12px;
+            top: -12px;
+            right: -8px;
+            font-size: 16px;
             animation: sparkle 2s infinite;
         }
 
         @keyframes sparkle {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
+            0%, 100% { 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
         .influencer-body {
-            width: 25px;
-            height: 20px;
-            background: #2c3e50;
-            margin: -5px auto 0;
+            width: 30px;
+            height: 25px;
+            background: linear-gradient(180deg, #2c3e50, #34495e);
+            margin: -8px auto 0;
             border-radius: 10px 10px 5px 5px;
+            border: 2px solid #1a252f;
         }
 
         /* Influencer Found Modal */
@@ -1447,27 +1453,36 @@
 
         // Spawn ELGL Influencers on the map
         function spawnInfluencers() {
+            console.log('Spawning ELGL Influencers...');
             const mapDiv = document.getElementById('googleMap');
             
-            // Randomly select 15-20 influencers to spawn initially
-            const numInfluencers = 15 + Math.floor(Math.random() * 6);
+            // Make sure we have a map div
+            if (!mapDiv) {
+                console.error('Map div not found!');
+                return;
+            }
+            
+            // Spawn 10-15 influencers immediately
+            const numInfluencers = 10 + Math.floor(Math.random() * 6);
+            console.log(`Spawning ${numInfluencers} influencers`);
+            
             const shuffled = [...elglInfluencers].sort(() => 0.5 - Math.random());
             const selectedInfluencers = shuffled.slice(0, numInfluencers);
             
             selectedInfluencers.forEach((influencer, index) => {
-                setTimeout(() => {
-                    const avatar = createInfluencerAvatar(influencer);
-                    mapDiv.appendChild(avatar);
-                    gameState.influencersOnMap.push({
-                        element: avatar,
-                        data: influencer
-                    });
-                }, index * 200); // Stagger spawn for visual effect
+                // Spawn immediately, no delay
+                const avatar = createInfluencerAvatar(influencer);
+                mapDiv.appendChild(avatar);
+                gameState.influencersOnMap.push({
+                    element: avatar,
+                    data: influencer
+                });
+                console.log(`Spawned ${influencer.name} at position`, avatar.style.left, avatar.style.top);
             });
             
-            // Spawn new influencers periodically
+            // Spawn new influencers every 20 seconds
             setInterval(() => {
-                if (gameState.influencersOnMap.length < 25) {
+                if (gameState.influencersOnMap.length < 20 && document.getElementById('gameContainer').style.display === 'block') {
                     const remaining = elglInfluencers.filter(inf => 
                         !gameState.influencersFound.includes(inf.name) &&
                         !gameState.influencersOnMap.some(m => m.data.name === inf.name)
@@ -1480,22 +1495,30 @@
                             element: avatar,
                             data: newInfluencer
                         });
+                        console.log(`New influencer spawned: ${newInfluencer.name}`);
                     }
                 }
-            }, 30000); // Spawn new one every 30 seconds
+            }, 20000);
         }
 
-        // Create an influencer avatar
+        // Create an influencer avatar - make them bigger and more visible
         function createInfluencerAvatar(influencer) {
             const avatar = document.createElement('div');
             avatar.className = 'influencer-avatar';
-            avatar.style.left = Math.random() * 90 + '%';
-            avatar.style.top = Math.random() * 90 + '%';
+            
+            // Position them randomly but visible
+            const leftPos = 10 + Math.random() * 80;
+            const topPos = 10 + Math.random() * 80;
+            avatar.style.left = leftPos + '%';
+            avatar.style.top = topPos + '%';
+            avatar.style.position = 'absolute';
+            avatar.style.zIndex = '75'; // Make sure they're above the map
             
             const head = document.createElement('div');
             head.className = 'influencer-head';
-            head.style.background = influencer.color || '#' + Math.floor(Math.random()*16777215).toString(16);
+            head.style.background = influencer.color || '#FF6B6B';
             head.textContent = influencer.initials;
+            head.title = influencer.name + ' from ' + influencer.location; // Tooltip
             
             const body = document.createElement('div');
             body.className = 'influencer-body';
@@ -1503,27 +1526,50 @@
             avatar.appendChild(head);
             avatar.appendChild(body);
             
-            // Click to find influencer
+            // Make them more interactive
+            avatar.style.cursor = 'pointer';
             avatar.onclick = () => findInfluencer(influencer, avatar);
             
-            // Random movement
+            // Add hover effect
+            avatar.onmouseover = () => {
+                avatar.style.transform = 'scale(1.3)';
+                avatar.style.zIndex = '100';
+            };
+            avatar.onmouseout = () => {
+                avatar.style.transform = 'scale(1)';
+                avatar.style.zIndex = '75';
+            };
+            
+            // Random movement with bounds checking
             moveInfluencerRandomly(avatar);
             
             return avatar;
         }
 
-        // Move influencer randomly around the map
+        // Move influencer randomly around the map - improved movement
         function moveInfluencerRandomly(avatar) {
-            setInterval(() => {
+            const moveInfluencer = () => {
                 const currentLeft = parseFloat(avatar.style.left);
                 const currentTop = parseFloat(avatar.style.top);
                 
-                const newLeft = Math.max(0, Math.min(90, currentLeft + (Math.random() - 0.5) * 10));
-                const newTop = Math.max(0, Math.min(90, currentTop + (Math.random() - 0.5) * 10));
+                // Move within bounds
+                const moveX = (Math.random() - 0.5) * 20;
+                const moveY = (Math.random() - 0.5) * 20;
                 
+                const newLeft = Math.max(5, Math.min(85, currentLeft + moveX));
+                const newTop = Math.max(5, Math.min(85, currentTop + moveY));
+                
+                // Smooth transition
+                avatar.style.transition = 'left 3s ease, top 3s ease';
                 avatar.style.left = newLeft + '%';
                 avatar.style.top = newTop + '%';
-            }, 5000 + Math.random() * 5000); // Move every 5-10 seconds
+            };
+            
+            // Initial movement
+            setTimeout(moveInfluencer, 1000);
+            
+            // Continue moving
+            setInterval(moveInfluencer, 5000 + Math.random() * 5000);
         }
 
         // Find an influencer
