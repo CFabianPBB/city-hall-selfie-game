@@ -220,14 +220,17 @@
             z-index: 1;
         }
 
-        /* Avatar Overlay */
+        /* Avatar Overlay - Make sure it's visible */
         #avatar {
             position: absolute;
             width: 80px;
             height: 100px;
-            z-index: 100;
+            z-index: 150;
             pointer-events: none;
             transition: all 2s ease;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         #avatar.walking {
@@ -1034,12 +1037,15 @@
 
         <!-- Score Display -->
         <div class="score-display">
-            <div class="score-label">Score</div>
+            <div class="score-label">Score:</div>
             <div class="score-value" id="scoreValue">0</div>
         </div>
 
+        <!-- Instructions Toggle -->
+        <button class="instructions-toggle" onclick="toggleInstructions()">HELP</button>
+
         <!-- Instructions -->
-        <div class="instructions">
+        <div class="instructions" id="instructionsPanel">
             <h4>How to Play</h4>
             <ul>
                 <li>Search for any city worldwide</li>
@@ -1076,7 +1082,9 @@
         <!-- Community Reel -->
         <div class="community-reel">
             <div class="reel-title">Community Selfies</div>
-            <div class="reel-container" id="communityReel"></div>
+            <div class="reel-container" id="communityReel">
+                <div class="reel-empty">Be the first to take a selfie!</div>
+            </div>
         </div>
 
         <!-- Control Panel -->
@@ -1370,6 +1378,7 @@
 
         // Initialize Google Map
         function initMap() {
+            console.log('Initializing Google Map...');
             gameState.googleMapsLoaded = true;
             gameState.map = new google.maps.Map(document.getElementById('googleMap'), {
                 zoom: 3,
@@ -1401,10 +1410,11 @@
             gameState.geocoder = new google.maps.Geocoder();
             gameState.placesService = new google.maps.places.PlacesService(gameState.map);
             
-            // Spawn city pins AFTER map is ready
-            setTimeout(() => {
+            // Wait for map to be fully loaded, then spawn pins
+            google.maps.event.addListenerOnce(gameState.map, 'idle', function() {
+                console.log('Map is ready, spawning pins...');
                 spawnCityPins();
-            }, 1000);
+            });
         }
 
         // Make initMap globally accessible for Google Maps callback
@@ -1477,12 +1487,23 @@
             
             // Position avatar at center of map
             if (gameState.googleMapsLoaded && gameState.map) {
-                positionAvatar(39.8283, -98.5795);
+                // Make sure avatar is visible
+                const avatar = document.getElementById('avatar');
+                avatar.style.display = 'block';
+                avatar.style.top = '50%';
+                avatar.style.left = '50%';
+                avatar.style.transform = 'translate(-50%, -50%)';
                 
-                // Spawn pins after map is settled
+                // Position on map coordinates
                 setTimeout(() => {
-                    spawnCityPins();
-                }, 2000);
+                    positionAvatar(39.8283, -98.5795);
+                }, 500);
+            } else {
+                // Even without map, show avatar
+                const avatar = document.getElementById('avatar');
+                avatar.style.display = 'block';
+                avatar.style.top = '50%';
+                avatar.style.left = '50%';
             }
         }
 
