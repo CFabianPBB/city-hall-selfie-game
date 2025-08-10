@@ -1478,6 +1478,11 @@
             // Position avatar at center of map
             if (gameState.googleMapsLoaded && gameState.map) {
                 positionAvatar(39.8283, -98.5795);
+                
+                // Spawn pins after map is settled
+                setTimeout(() => {
+                    spawnCityPins();
+                }, 2000);
             }
         }
 
