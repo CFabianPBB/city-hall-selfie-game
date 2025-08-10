@@ -3,64 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Hall Selfie - The Game!</title>
+    <title>City Hall Selfie - The Game! | ELGL 10th Anniversary</title>
+    
+    <!-- Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOcjnPhgtkTfIIxzGcQlyCZqosaWFsLBY&libraries=places"></script>
+    
+    <!-- SimCity-style Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             overflow: hidden;
-            background: linear-gradient(135deg, #87CEEB 0%, #98D8C8 100%);
+            background: #4a90e2;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        /* Start Screen */
+        /* Start Screen with SimCity Style */
         #startScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
 
-        .start-container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            animation: slideIn 0.5s ease;
+        #startScreen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.1) 2px,
+                    rgba(0,0,0,0.1) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.1) 2px,
+                    rgba(0,0,0,0.1) 4px
+                );
+            opacity: 0.3;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .start-container {
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 
+                0 0 0 3px #333,
+                0 0 0 6px #666,
+                0 20px 60px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            border: 2px solid #000;
+        }
+
+        .simcity-header {
+            background: linear-gradient(180deg, #0066CC 0%, #004499 100%);
+            color: white;
+            padding: 15px;
+            margin: -40px -40px 20px -40px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 3px solid #000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .elgl-logo {
+            width: 200px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
         }
 
         .game-title {
-            font-size: 2.5em;
-            color: #667eea;
-            margin-bottom: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 
+                2px 2px 0px #4a90e2,
+                4px 4px 0px rgba(0,0,0,0.2);
+            line-height: 1.5;
         }
 
-        .elgl-badge {
-            background: #ff6b6b;
+        .anniversary-badge {
+            background: linear-gradient(135deg, #27ae60, #229954);
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
             display: inline-block;
-            margin-bottom: 20px;
+            margin: 10px 0 20px;
             font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            border: 2px solid #196F3D;
         }
 
         .form-group {
@@ -70,65 +130,72 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 8px;
+            color: #2c3e50;
             font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #2c3e50;
+            border-radius: 5px;
             font-size: 16px;
+            font-family: 'Orbitron', sans-serif;
+            background: #f8f9fa;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-        }
-
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .file-upload input[type=file] {
-            position: absolute;
-            left: -9999px;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
 
         .file-upload label {
             display: block;
-            padding: 12px;
-            background: #f0f0f0;
-            border: 2px dashed #667eea;
-            border-radius: 8px;
+            padding: 15px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: 2px solid #000;
+            border-radius: 5px;
             text-align: center;
             cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
         }
 
         .file-upload label:hover {
-            background: #e0e0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .start-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #27ae60, #229954);
             color: white;
-            border: none;
+            border: 3px solid #000;
             padding: 15px 40px;
-            font-size: 1.2em;
-            border-radius: 30px;
+            font-size: 16px;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            box-shadow: 
+                3px 3px 0px #000,
+                6px 6px 0px rgba(0,0,0,0.2);
         }
 
         .start-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transform: translate(-2px, -2px);
+            box-shadow: 
+                5px 5px 0px #000,
+                8px 8px 0px rgba(0,0,0,0.2);
         }
 
         .start-btn:disabled {
@@ -144,89 +211,24 @@
             height: 100vh;
         }
 
-        /* SimCity Style Map */
-        #worldMap {
+        /* Google Maps Integration */
+        #googleMap {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #6B8E23;
-            overflow: hidden;
+            z-index: 1;
         }
 
-        .map-grid {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.1) 40px, rgba(255,255,255,0.1) 41px),
-                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.1) 40px, rgba(255,255,255,0.1) 41px);
-        }
-
-        /* Isometric Buildings */
-        .building {
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .building:hover {
-            transform: scale(1.1) translateY(-5px);
-        }
-
-        .city-hall {
-            width: 60px;
-            height: 80px;
-        }
-
-        .city-hall-base {
-            width: 60px;
-            height: 40px;
-            background: #8B7355;
-            transform: rotateX(60deg) rotateZ(45deg);
-            position: absolute;
-            bottom: 0;
-        }
-
-        .city-hall-building {
-            width: 50px;
-            height: 60px;
-            background: linear-gradient(180deg, #CD853F 0%, #8B7355 100%);
-            position: absolute;
-            bottom: 20px;
-            left: 5px;
-            border: 2px solid #654321;
-        }
-
-        .city-hall-building::before {
-            content: '🏛️';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 30px;
-        }
-
-        .city-hall-roof {
-            width: 0;
-            height: 0;
-            border-left: 30px solid transparent;
-            border-right: 30px solid transparent;
-            border-bottom: 20px solid #8B4513;
-            position: absolute;
-            top: -20px;
-            left: -5px;
-        }
-
-        /* Avatar (JibJab Style) */
+        /* Avatar Overlay */
         #avatar {
             position: absolute;
-            width: 70px;
+            width: 80px;
             height: 100px;
-            transition: all 0.5s ease;
-            z-index: 50;
-            cursor: grab;
+            z-index: 100;
+            pointer-events: none;
+            transition: all 2s ease;
         }
 
         #avatar.walking {
@@ -235,152 +237,180 @@
 
         @keyframes walk {
             0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-5px) rotate(5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
         .avatar-head {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background-size: cover;
             background-position: center;
             margin: 0 auto;
             border: 3px solid white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.5);
             position: relative;
             z-index: 2;
         }
 
         .avatar-body {
-            width: 40px;
-            height: 45px;
-            background: #4169E1;
-            margin: -10px auto 0;
+            width: 45px;
+            height: 50px;
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            margin: -15px auto 0;
             border-radius: 20px 20px 10px 10px;
             position: relative;
+            border: 2px solid #1e5f8e;
         }
 
         .avatar-arms {
             position: absolute;
-            width: 60px;
+            width: 70px;
             height: 8px;
-            background: #4169E1;
+            background: #3498db;
             top: 10px;
-            left: -10px;
+            left: -12px;
             border-radius: 4px;
+            border: 2px solid #1e5f8e;
         }
 
         .avatar-legs {
             position: absolute;
-            bottom: -20px;
-            left: 10px;
+            bottom: -25px;
+            left: 12px;
             width: 20px;
-            height: 20px;
+            height: 25px;
         }
 
         .avatar-legs::before,
         .avatar-legs::after {
             content: '';
             position: absolute;
-            width: 8px;
-            height: 20px;
-            background: #333;
-            border-radius: 0 0 4px 4px;
+            width: 10px;
+            height: 25px;
+            background: #2c3e50;
+            border-radius: 0 0 5px 5px;
+            border: 1px solid #1a252f;
         }
 
         .avatar-legs::before { left: 0; }
         .avatar-legs::after { right: 0; }
 
-        /* Control Panel */
+        /* Control Panel - SimCity Style */
         .control-panel {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            border-radius: 5px;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 5px 30px rgba(0,0,0,0.5);
+            z-index: 200;
+            border: 3px solid #2c3e50;
         }
 
         .search-box {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .search-box input {
             padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            width: 300px;
+            border: 2px solid #2c3e50;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 350px;
+            font-family: 'Orbitron', sans-serif;
+            background: white;
         }
 
         .go-btn {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #00C851 0%, #00AA44 100%);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid #000;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 12px;
+            font-family: 'Press Start 2P', cursive;
             transition: all 0.3s;
+            box-shadow: 
+                2px 2px 0px #000;
         }
 
         .go-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 200, 81, 0.4);
+            transform: translate(-1px, -1px);
+            box-shadow: 
+                3px 3px 0px #000;
         }
 
-        /* Score Display */
+        /* Score Display - SimCity Style */
         .score-display {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(145deg, #2c3e50, #34495e);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-            z-index: 100;
+            border-radius: 5px;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 5px 20px rgba(0,0,0,0.5);
+            z-index: 200;
+            border: 2px solid #1a252f;
+            color: white;
         }
 
         .score-label {
-            color: #667eea;
-            font-size: 14px;
+            font-size: 12px;
             margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #95a5a6;
         }
 
         .score-value {
-            font-size: 2.5em;
+            font-size: 36px;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Press Start 2P', cursive;
+            color: #f1c40f;
+            text-shadow: 2px 2px 0px #000;
         }
 
-        /* Leaderboard */
+        /* Leaderboard - SimCity Style */
         .leaderboard {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-            width: 280px;
+            border-radius: 5px;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 5px 30px rgba(0,0,0,0.5);
+            width: 300px;
             max-height: 400px;
             overflow-y: auto;
-            z-index: 100;
+            z-index: 200;
+            border: 3px solid #2c3e50;
         }
 
         .leaderboard h3 {
-            color: #667eea;
+            color: #2c3e50;
             margin-bottom: 15px;
             text-align: center;
-            font-size: 1.4em;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
         }
 
         .leaderboard-entry {
@@ -388,37 +418,53 @@
             align-items: center;
             padding: 10px;
             margin-bottom: 8px;
-            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
-            border-radius: 8px;
+            background: white;
+            border: 2px solid #2c3e50;
+            border-radius: 5px;
             transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .leaderboard-entry:hover {
-            background: linear-gradient(135deg, #e8e8ff 0%, #d8d8ff 100%);
+            background: #f1c40f;
             transform: translateX(5px);
         }
 
-        .leaderboard-entry.gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
-        .leaderboard-entry.silver { background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%); }
-        .leaderboard-entry.bronze { background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%); }
+        .leaderboard-entry.gold {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            border-color: #d68910;
+        }
+
+        .leaderboard-entry.silver {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            border-color: #566573;
+        }
+
+        .leaderboard-entry.bronze {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            border-color: #a04000;
+        }
 
         .rank {
             font-weight: bold;
-            color: #667eea;
+            color: #2c3e50;
             margin-right: 15px;
-            font-size: 1.2em;
-            width: 30px;
+            font-size: 16px;
+            width: 35px;
+            font-family: 'Press Start 2P', cursive;
         }
 
         .player-name {
             flex-grow: 1;
-            font-weight: 500;
+            font-weight: 600;
+            color: #2c3e50;
         }
 
         .player-score {
             font-weight: bold;
-            color: #764ba2;
-            font-size: 1.1em;
+            color: #27ae60;
+            font-size: 18px;
+            font-family: 'Press Start 2P', cursive;
         }
 
         /* Logo Queue */
@@ -428,38 +474,44 @@
             left: 20px;
             display: flex;
             gap: 10px;
-            z-index: 100;
+            z-index: 200;
         }
 
         .logo-item {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             background: white;
-            border-radius: 10px;
-            padding: 8px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 3px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             animation: bounceIn 0.5s ease;
-            font-size: 24px;
             font-weight: bold;
+            border: 2px solid #2c3e50;
         }
 
         @keyframes bounceIn {
-            0% { transform: scale(0); }
-            60% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% { transform: scale(0) rotate(180deg); }
+            60% { transform: scale(1.2) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0); }
         }
 
         .logo-item.tyler {
-            background: linear-gradient(135deg, #0066CC 0%, #004499 100%);
+            background: linear-gradient(135deg, #0066CC, #004499);
             color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
         }
 
         .logo-item.resourcex {
-            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A24 100%);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
         }
 
         /* Selfie Modal */
@@ -470,7 +522,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -481,12 +533,16 @@
         }
 
         .selfie-content {
-            background: white;
+            background: linear-gradient(145deg, #ecf0f1, #ffffff);
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 10px;
             text-align: center;
-            max-width: 600px;
+            max-width: 700px;
             animation: zoomIn 0.3s ease;
+            box-shadow: 
+                0 0 0 3px #000,
+                0 20px 60px rgba(0,0,0,0.5);
+            border: 3px solid #2c3e50;
         }
 
         @keyframes zoomIn {
@@ -495,59 +551,88 @@
         }
 
         .selfie-title {
-            color: #667eea;
+            color: #2c3e50;
             margin-bottom: 20px;
-            font-size: 1.8em;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            text-transform: uppercase;
         }
 
         .selfie-preview {
             position: relative;
-            width: 500px;
-            height: 350px;
+            width: 600px;
+            height: 400px;
             margin: 20px auto;
-            border: 5px solid #667eea;
-            border-radius: 10px;
+            border: 5px solid #2c3e50;
+            border-radius: 5px;
             overflow: hidden;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjM1MCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjE1MCIgeT0iMTAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTUwLDEwMCAyNTAsMzAgMzUwLDEwMCIgZmlsbD0iIzhiNDUxMyIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYwIj7wn4+bPC90ZXh0Pgo8L3N2Zz4=') center/cover;
+            background: #333;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .selfie-background {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
 
         .selfie-person {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 120px;
-            height: 150px;
+            width: 140px;
+            height: 180px;
+            filter: drop-shadow(0 5px 20px rgba(0,0,0,0.5));
         }
 
         .selfie-person-head {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             background-size: cover;
             background-position: center;
             margin: 0 auto;
             border: 4px solid white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .selfie-person-body {
-            width: 60px;
-            height: 70px;
-            background: #4169E1;
-            margin: -20px auto 0;
+            width: 70px;
+            height: 80px;
+            background: linear-gradient(180deg, #3498db, #2980b9);
+            margin: -25px auto 0;
             border-radius: 30px 30px 10px 10px;
+            border: 3px solid #1e5f8e;
         }
 
-        .selfie-watermark {
+        /* ELGL Watermark */
+        .elgl-watermark {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 5px 10px;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: auto;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+        }
+
+        .selfie-date {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
             border-radius: 5px;
             font-weight: bold;
-            color: #667eea;
+            color: #2c3e50;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .modal-buttons {
@@ -558,23 +643,30 @@
         }
 
         .modal-btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
+            padding: 12px 25px;
+            border: 2px solid #000;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 12px;
+            font-family: 'Press Start 2P', cursive;
             transition: all 0.3s;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .modal-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #000;
         }
 
         .modal-btn.primary {
-            background: linear-gradient(135deg, #00C851 0%, #00AA44 100%);
+            background: linear-gradient(135deg, #27ae60, #229954);
             color: white;
         }
 
         .modal-btn.secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
         }
 
         .modal-btn.linkedin {
@@ -582,24 +674,23 @@
             color: white;
         }
 
-        .modal-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
         /* Points Popup */
         .points-popup {
             position: absolute;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #333;
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: #2c3e50;
             padding: 15px 25px;
-            border-radius: 25px;
+            border-radius: 5px;
             font-weight: bold;
-            font-size: 1.8em;
-            z-index: 200;
+            font-size: 20px;
+            font-family: 'Press Start 2P', cursive;
+            z-index: 500;
             animation: floatUp 2s ease forwards;
             pointer-events: none;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+            box-shadow: 
+                0 0 0 2px #000,
+                0 5px 20px rgba(241, 196, 15, 0.5);
+            border: 2px solid #d68910;
         }
 
         @keyframes floatUp {
@@ -608,31 +699,38 @@
                 opacity: 1;
             }
             50% {
-                transform: translateY(-50px) scale(1.2);
+                transform: translateY(-80px) scale(1.2);
                 opacity: 1;
             }
             100% {
-                transform: translateY(-120px) scale(0.8);
+                transform: translateY(-150px) scale(0.8);
                 opacity: 0;
             }
         }
 
-        /* Instructions */
+        /* Instructions Panel */
         .instructions {
             position: absolute;
             top: 120px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 250px;
-            font-size: 14px;
-            z-index: 100;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 280px;
+            z-index: 200;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 5px 20px rgba(0,0,0,0.5);
+            border: 2px solid #1a252f;
+            color: white;
         }
 
         .instructions h4 {
-            color: #667eea;
-            margin-bottom: 10px;
+            color: #f1c40f;
+            margin-bottom: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            text-transform: uppercase;
         }
 
         .instructions ul {
@@ -641,16 +739,83 @@
         }
 
         .instructions li {
-            margin-bottom: 5px;
-            padding-left: 20px;
+            margin-bottom: 10px;
+            padding-left: 25px;
             position: relative;
+            font-size: 14px;
+            line-height: 1.4;
         }
 
         .instructions li::before {
-            content: '→';
+            content: '▶';
             position: absolute;
             left: 0;
-            color: #667eea;
+            color: #f1c40f;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #34495e;
+            border-top: 5px solid #f1c40f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Map Marker for City Hall */
+        .city-hall-marker {
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjAiIHk9IjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn4+bPC90ZXh0Pgo8L3N2Zz4=');
+            background-size: contain;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
@@ -658,43 +823,57 @@
     <!-- Start Screen -->
     <div id="startScreen">
         <div class="start-container">
-            <h1 class="game-title">🏛️ City Hall Selfie</h1>
-            <div class="elgl-badge">ELGL's City Hall Selfie Day</div>
+            <div class="simcity-header">City Hall Selfie Game - Menu</div>
+            
+            <!-- ELGL Logo Placeholder -->
+            <svg class="elgl-logo" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="100" height="120" fill="#27ae60" stroke="#000" stroke-width="3"/>
+                <polygon points="50,50 100,20 150,50" fill="#229954" stroke="#000" stroke-width="3"/>
+                <circle cx="100" cy="90" r="15" fill="#fff"/>
+                <text x="100" y="140" text-anchor="middle" font-family="Press Start 2P" font-size="16" fill="#fff">ELGL</text>
+                <rect x="30" y="180" width="140" height="50" fill="#27ae60" stroke="#000" stroke-width="2"/>
+                <text x="100" y="195" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="#fff">10TH ANNIVERSARY</text>
+                <text x="100" y="210" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#fff">CITY HALL</text>
+                <text x="100" y="225" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#fff">SELFIE DAY</text>
+            </svg>
+            
+            <h1 class="game-title">City Hall<br>Selfie Game</h1>
+            <div class="anniversary-badge">🎉 August 12 - ELGL's 10th Anniversary 🎉</div>
             
             <form id="startForm" onsubmit="startGame(event)">
                 <div class="form-group">
-                    <label for="playerName">Your Name:</label>
+                    <label for="playerName">Player Name:</label>
                     <input type="text" id="playerName" required placeholder="Enter your name">
                 </div>
                 
                 <div class="form-group">
-                    <label for="playerEmail">Your Email:</label>
+                    <label for="playerEmail">Email Address:</label>
                     <input type="email" id="playerEmail" required placeholder="Enter your email">
                 </div>
                 
                 <div class="form-group">
-                    <label>Upload Your Photo (for your avatar):</label>
+                    <label>Avatar Photo:</label>
                     <div class="file-upload">
-                        <input type="file" id="photoUpload" accept="image/*" required onchange="handlePhotoUpload(event)">
+                        <input type="file" id="photoUpload" accept="image/*" required onchange="handlePhotoUpload(event)" style="display: none;">
                         <label for="photoUpload" id="photoLabel">
-                            📸 Click to upload your photo
+                            📸 Upload Photo
                         </label>
                     </div>
                 </div>
                 
-                <button type="submit" class="start-btn" id="startBtn" disabled>Start Playing!</button>
+                <button type="submit" class="start-btn" id="startBtn" disabled>Start Game</button>
             </form>
         </div>
     </div>
 
     <!-- Game Container -->
     <div id="gameContainer">
-        <!-- World Map -->
-        <div id="worldMap">
-            <div class="map-grid"></div>
-            
-            <!-- Avatar -->
-            <div id="avatar" style="top: 50%; left: 50%;">
+        <!-- Google Map -->
+        <div id="googleMap"></div>
+        
+        <!-- Avatar -->
+        <div id="avatar">
+            <div class="avatar-container">
                 <div class="avatar-head" id="avatarHead"></div>
                 <div class="avatar-body">
                     <div class="avatar-arms"></div>
@@ -705,28 +884,30 @@
 
         <!-- Score Display -->
         <div class="score-display">
-            <div class="score-label">Your Score</div>
+            <div class="score-label">Score</div>
             <div class="score-value" id="scoreValue">0</div>
         </div>
 
         <!-- Instructions -->
         <div class="instructions">
-            <h4>How to Play:</h4>
+            <h4>How to Play</h4>
             <ul>
-                <li>Enter a city name</li>
-                <li>Watch your avatar travel</li>
-                <li>Take selfies at City Halls</li>
-                <li>Special bonuses for Tyler & ResourceX cities!</li>
+                <li>Type any city name worldwide</li>
+                <li>Watch your avatar travel there</li>
+                <li>Take selfies at City Halls (+5 pts)</li>
+                <li>Tyler offices = +10 points</li>
+                <li>Plano/Yarmouth = +50 points!</li>
+                <li>PBB cities = +25 points</li>
             </ul>
         </div>
 
         <!-- Leaderboard -->
         <div class="leaderboard">
-            <h3>🏆 Top Players</h3>
+            <h3>Top Players</h3>
             <div id="leaderboardList">
                 <div class="leaderboard-entry">
-                    <span class="rank">#1</span>
-                    <span class="player-name">Waiting for players...</span>
+                    <span class="rank">1</span>
+                    <span class="player-name">Waiting...</span>
                     <span class="player-score">0</span>
                 </div>
             </div>
@@ -738,8 +919,8 @@
         <!-- Control Panel -->
         <div class="control-panel">
             <div class="search-box">
-                <input type="text" id="locationSearch" placeholder="Enter a city name (e.g., Denver, Plano, Washington)">
-                <button class="go-btn" onclick="searchLocation()">🚀 Travel There!</button>
+                <input type="text" id="locationSearch" placeholder="Enter city name (e.g., Denver, Paris, Tokyo)">
+                <button class="go-btn" onclick="searchLocation()">GO!</button>
             </div>
         </div>
     </div>
@@ -747,20 +928,43 @@
     <!-- Selfie Modal -->
     <div class="selfie-modal" id="selfieModal">
         <div class="selfie-content">
-            <h2 class="selfie-title">📸 City Hall Selfie Time!</h2>
+            <h2 class="selfie-title">City Hall Selfie!</h2>
             <div class="selfie-preview">
-                <div class="selfie-person" id="selfiePerson">
-                    <div class="selfie-person-head" id="selfiePersonHead"></div>
-                    <div class="selfie-person-body"></div>
+                <div class="selfie-background" id="selfieBackground">
+                    <div class="selfie-person" id="selfiePerson">
+                        <div class="selfie-person-head" id="selfiePersonHead"></div>
+                        <div class="selfie-person-body"></div>
+                    </div>
+                    
+                    <!-- ELGL Watermark -->
+                    <svg class="elgl-watermark" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="200" height="250" fill="rgba(255,255,255,0.9)" rx="10"/>
+                        <rect x="50" y="40" width="100" height="120" fill="#27ae60"/>
+                        <polygon points="50,40 100,10 150,40" fill="#229954"/>
+                        <text x="100" y="90" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#fff">ELGL</text>
+                        <text x="100" y="120" text-anchor="middle" font-family="Arial" font-size="12" fill="#fff">CITY HALL</text>
+                        <text x="100" y="140" text-anchor="middle" font-family="Arial" font-size="12" fill="#fff">SELFIE DAY</text>
+                        <text x="100" y="180" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#27ae60">AUG 12</text>
+                        <text x="100" y="200" text-anchor="middle" font-family="Arial" font-size="10" fill="#666">10th Anniversary</text>
+                    </svg>
+                    
+                    <div class="selfie-date">AUGUST 12, 2024</div>
                 </div>
-                <div class="selfie-watermark">City Hall Selfie Day 2024</div>
             </div>
-            <p id="locationName" style="font-size: 1.2em; color: #667eea; margin-bottom: 20px;"></p>
+            <p id="locationName" style="font-size: 16px; color: #2c3e50; margin: 15px 0; font-family: 'Orbitron', sans-serif; font-weight: bold;"></p>
             <div class="modal-buttons">
-                <button class="modal-btn primary" onclick="takeSelfie()">📸 Snap Photo!</button>
-                <button class="modal-btn linkedin" onclick="shareToLinkedIn()">🔗 Share on LinkedIn</button>
-                <button class="modal-btn secondary" onclick="closeSelfieModal()">Keep Exploring</button>
+                <button class="modal-btn primary" onclick="takeSelfie()">SNAP!</button>
+                <button class="modal-btn linkedin" onclick="shareToLinkedIn()">SHARE</button>
+                <button class="modal-btn secondary" onclick="closeSelfieModal()">CLOSE</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading City Hall...</div>
         </div>
     </div>
 
@@ -778,26 +982,58 @@
             playerPhoto: null,
             score: 0,
             currentCity: null,
+            currentLocation: null,
             logos: [],
-            isMoving: false
+            isMoving: false,
+            map: null,
+            markers: [],
+            geocoder: null,
+            placesService: null
         };
 
-        // City Database with coordinates
-        const cityDatabase = {
-            'denver': { x: 25, y: 40, type: 'pbb', points: 25, name: 'Denver, CO' },
-            'plano': { x: 30, y: 55, type: 'tyler-major', points: 50, name: 'Plano, TX' },
-            'yarmouth': { x: 70, y: 35, type: 'tyler-major', points: 50, name: 'Yarmouth, ME' },
-            'washington': { x: 68, y: 42, type: 'capital', points: 5, name: 'Washington, DC' },
-            'austin': { x: 28, y: 58, type: 'tyler', points: 10, name: 'Austin, TX' },
-            'chicago': { x: 55, y: 38, type: 'regular', points: 5, name: 'Chicago, IL' },
-            'seattle': { x: 12, y: 30, type: 'regular', points: 5, name: 'Seattle, WA' },
-            'miami': { x: 65, y: 70, type: 'regular', points: 5, name: 'Miami, FL' },
-            'boston': { x: 72, y: 37, type: 'regular', points: 5, name: 'Boston, MA' },
-            'phoenix': { x: 20, y: 52, type: 'regular', points: 5, name: 'Phoenix, AZ' },
-            'portland': { x: 10, y: 32, type: 'pbb', points: 25, name: 'Portland, OR' },
-            'sacramento': { x: 8, y: 42, type: 'regular', points: 5, name: 'Sacramento, CA' },
-            'atlanta': { x: 58, y: 52, type: 'regular', points: 5, name: 'Atlanta, GA' }
+        // Special Cities Database
+        const specialCities = {
+            'plano': { type: 'tyler-major', points: 50, lat: 33.0198, lng: -96.6989 },
+            'yarmouth': { type: 'tyler-major', points: 50, lat: 43.8007, lng: -70.1870 },
+            'denver': { type: 'pbb', points: 25, lat: 39.7392, lng: -104.9903 },
+            'portland': { type: 'pbb', points: 25, lat: 45.5152, lng: -122.6784 },
+            'austin': { type: 'tyler', points: 10, lat: 30.2672, lng: -97.7431 },
+            'dallas': { type: 'tyler', points: 10, lat: 32.7767, lng: -96.7970 },
+            'detroit': { type: 'tyler', points: 10, lat: 42.3314, lng: -83.0458 }
         };
+
+        // Initialize Google Map
+        function initMap() {
+            gameState.map = new google.maps.Map(document.getElementById('googleMap'), {
+                zoom: 3,
+                center: { lat: 39.8283, lng: -98.5795 }, // Center of USA
+                styles: [
+                    {
+                        featureType: "all",
+                        elementType: "geometry",
+                        stylers: [{ color: "#6B8E23" }]
+                    },
+                    {
+                        featureType: "water",
+                        elementType: "geometry",
+                        stylers: [{ color: "#4682B4" }]
+                    },
+                    {
+                        featureType: "road",
+                        elementType: "geometry",
+                        stylers: [{ color: "#8B7355" }]
+                    },
+                    {
+                        featureType: "poi.park",
+                        elementType: "geometry",
+                        stylers: [{ color: "#228B22" }]
+                    }
+                ]
+            });
+
+            gameState.geocoder = new google.maps.Geocoder();
+            gameState.placesService = new google.maps.places.PlacesService(gameState.map);
+        }
 
         // Photo Upload Handler
         function handlePhotoUpload(event) {
@@ -806,7 +1042,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     gameState.playerPhoto = e.target.result;
-                    document.getElementById('photoLabel').innerHTML = '✅ Photo uploaded!';
+                    document.getElementById('photoLabel').innerHTML = '✅ PHOTO READY';
                     document.getElementById('startBtn').disabled = false;
                 };
                 reader.readAsDataURL(file);
@@ -821,8 +1057,13 @@
             gameState.playerEmail = document.getElementById('playerEmail').value;
             
             if (!gameState.playerPhoto) {
-                alert('Please upload your photo to create your avatar!');
+                alert('Please upload your photo!');
                 return;
+            }
+
+            // Initialize map if not already done
+            if (!gameState.map) {
+                initMap();
             }
 
             // Register player
@@ -839,139 +1080,174 @@
                 
                 const data = await response.json();
                 gameState.playerId = data.player.id;
-                
-                // Set avatar photo
-                document.getElementById('avatarHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
-                document.getElementById('selfiePersonHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
-                
-                // Start game
-                document.getElementById('startScreen').style.display = 'none';
-                document.getElementById('gameContainer').style.display = 'block';
-                
-                // Play background music
-                document.getElementById('bgMusic').play().catch(e => console.log('Audio play failed'));
-                
-                // Load leaderboard
-                updateLeaderboard();
-                
-                // Add initial buildings
-                initializeBuildings();
-                
             } catch (error) {
                 console.error('Registration failed:', error);
-                alert('Failed to register. The game will work offline!');
-                
-                // Offline mode
                 gameState.playerId = 'offline_' + Date.now();
-                document.getElementById('avatarHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
-                document.getElementById('selfiePersonHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
-                document.getElementById('startScreen').style.display = 'none';
-                document.getElementById('gameContainer').style.display = 'block';
-                initializeBuildings();
             }
-        }
 
-        // Initialize Buildings on Map
-        function initializeBuildings() {
-            const worldMap = document.getElementById('worldMap');
+            // Set avatar photo
+            document.getElementById('avatarHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
+            document.getElementById('selfiePersonHead').style.backgroundImage = `url(${gameState.playerPhoto})`;
             
-            Object.keys(cityDatabase).forEach(cityKey => {
-                const city = cityDatabase[cityKey];
-                const building = document.createElement('div');
-                building.className = 'building city-hall';
-                building.style.left = city.x + '%';
-                building.style.top = city.y + '%';
-                building.onclick = () => travelToCity(cityKey);
-                
-                building.innerHTML = `
-                    <div class="city-hall-roof"></div>
-                    <div class="city-hall-building"></div>
-                    <div class="city-hall-base"></div>
-                `;
-                
-                worldMap.appendChild(building);
-            });
+            // Start game
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            
+            // Play background music
+            document.getElementById('bgMusic').play().catch(e => console.log('Audio autoplay blocked'));
+            
+            // Load leaderboard
+            updateLeaderboard();
+            
+            // Position avatar at center of map
+            positionAvatar(39.8283, -98.5795);
         }
 
-        // Search Location
-        function searchLocation() {
-            const searchInput = document.getElementById('locationSearch').value.toLowerCase().trim();
+        // Search for location
+        async function searchLocation() {
+            const searchInput = document.getElementById('locationSearch').value.trim();
             if (!searchInput) {
                 alert('Please enter a city name!');
                 return;
             }
-            
-            // Check if city exists in database
-            if (cityDatabase[searchInput]) {
-                travelToCity(searchInput);
-            } else {
-                // Create random city
-                const randomCity = {
-                    x: 10 + Math.random() * 80,
-                    y: 10 + Math.random() * 80,
-                    type: 'regular',
-                    points: 5,
-                    name: searchInput.charAt(0).toUpperCase() + searchInput.slice(1)
-                };
-                cityDatabase[searchInput] = randomCity;
-                
-                // Add building to map
-                const worldMap = document.getElementById('worldMap');
-                const building = document.createElement('div');
-                building.className = 'building city-hall';
-                building.style.left = randomCity.x + '%';
-                building.style.top = randomCity.y + '%';
-                building.onclick = () => travelToCity(searchInput);
-                
-                building.innerHTML = `
-                    <div class="city-hall-roof"></div>
-                    <div class="city-hall-building"></div>
-                    <div class="city-hall-base"></div>
-                `;
-                
-                worldMap.appendChild(building);
-                travelToCity(searchInput);
-            }
-            
+
+            // Show loading
+            showLoading();
+
+            // Check if it's a special city
+            const cityLower = searchInput.toLowerCase();
+            const specialCity = specialCities[cityLower];
+
+            // Geocode the location
+            gameState.geocoder.geocode({ address: searchInput }, async (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const location = results[0].geometry.location;
+                    const lat = location.lat();
+                    const lng = location.lng();
+                    
+                    // Store current city info
+                    gameState.currentCity = {
+                        name: results[0].formatted_address,
+                        lat: lat,
+                        lng: lng,
+                        type: specialCity ? specialCity.type : 'regular',
+                        points: specialCity ? specialCity.points : 5
+                    };
+
+                    // Move map to location
+                    gameState.map.setCenter(location);
+                    gameState.map.setZoom(15);
+
+                    // Add marker
+                    const marker = new google.maps.Marker({
+                        position: location,
+                        map: gameState.map,
+                        icon: {
+                            url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjAiIHk9IjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn4+bPC90ZXh0Pgo8L3N2Zz4=',
+                            scaledSize: new google.maps.Size(40, 40)
+                        },
+                        animation: google.maps.Animation.DROP
+                    });
+
+                    gameState.markers.push(marker);
+
+                    // Animate avatar to location
+                    await animateAvatarToLocation(lat, lng);
+
+                    // Search for city hall image
+                    await searchCityHallImage(searchInput);
+
+                    hideLoading();
+
+                    // Show selfie modal
+                    setTimeout(() => showSelfieModal(), 500);
+
+                } else {
+                    hideLoading();
+                    alert('Could not find that city. Try another name!');
+                }
+            });
+
             document.getElementById('locationSearch').value = '';
         }
 
-        // Travel to City
-        function travelToCity(cityKey) {
-            if (gameState.isMoving) return;
+        // Search for City Hall Image
+        async function searchCityHallImage(cityName) {
+            try {
+                // Use Google Custom Search API or fallback to a default image
+                // For demo, using a placeholder approach
+                const searchQuery = `${cityName} city hall building`;
+                
+                // You would need to implement actual image search here
+                // For now, using a generated placeholder
+                const imageUrl = `https://source.unsplash.com/600x400/?city-hall,${encodeURIComponent(cityName)},government-building`;
+                
+                document.getElementById('selfieBackground').style.backgroundImage = `url(${imageUrl})`;
+            } catch (error) {
+                console.error('Image search failed:', error);
+                // Use default city hall image
+                document.getElementById('selfieBackground').style.backgroundImage = 
+                    'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2U2ZjJmZiIvPgogIDxyZWN0IHg9IjIwMCIgeT0iMTUwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2NkODUzZiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAwLDE1MCAzMDAsMTAwIDQwMCwxNTAiIGZpbGw9IiM4YjQ1MTMiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2MCI+8J+PmzwvdGV4dD4KPC9zdmc+)';
+            }
+        }
+
+        // Animate Avatar to Location
+        async function animateAvatarToLocation(lat, lng) {
+            return new Promise(resolve => {
+                const avatar = document.getElementById('avatar');
+                avatar.classList.add('walking');
+                
+                // Position avatar on map
+                positionAvatar(lat, lng);
+                
+                setTimeout(() => {
+                    avatar.classList.remove('walking');
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Position Avatar on Map
+        function positionAvatar(lat, lng) {
+            if (!gameState.map) return;
             
-            const city = cityDatabase[cityKey];
-            gameState.currentCity = city;
-            gameState.isMoving = true;
+            const projection = gameState.map.getProjection();
+            if (!projection) {
+                // If projection not ready, try again
+                setTimeout(() => positionAvatar(lat, lng), 100);
+                return;
+            }
+            
+            const point = projection.fromLatLngToPoint(new google.maps.LatLng(lat, lng));
+            const scale = Math.pow(2, gameState.map.getZoom());
+            
+            const worldPoint = new google.maps.Point(point.x * scale, point.y * scale);
+            const centerPoint = projection.fromLatLngToPoint(gameState.map.getCenter());
+            const centerWorld = new google.maps.Point(centerPoint.x * scale, centerPoint.y * scale);
+            
+            const mapDiv = document.getElementById('googleMap');
+            const pixelX = (worldPoint.x - centerWorld.x) + mapDiv.offsetWidth / 2;
+            const pixelY = (worldPoint.y - centerWorld.y) + mapDiv.offsetHeight / 2;
             
             const avatar = document.getElementById('avatar');
-            avatar.classList.add('walking');
-            
-            // Animate avatar movement
-            avatar.style.left = city.x + '%';
-            avatar.style.top = city.y + '%';
-            
-            setTimeout(() => {
-                avatar.classList.remove('walking');
-                gameState.isMoving = false;
-                showSelfieModal(city);
-            }, 1500);
+            avatar.style.left = pixelX + 'px';
+            avatar.style.top = pixelY + 'px';
         }
 
         // Show Selfie Modal
-        function showSelfieModal(city) {
+        function showSelfieModal() {
             const modal = document.getElementById('selfieModal');
             const locationName = document.getElementById('locationName');
             
-            locationName.textContent = `📍 ${city.name}`;
+            locationName.innerHTML = `📍 ${gameState.currentCity.name}`;
             
-            // Add special effects for special locations
-            if (city.type === 'tyler-major') {
-                locationName.innerHTML += ' <span style="color: #0066CC;">🏢 Tyler Technologies HQ!</span>';
-            } else if (city.type === 'tyler') {
-                locationName.innerHTML += ' <span style="color: #0066CC;">🏢 Tyler Office</span>';
-            } else if (city.type === 'pbb') {
-                locationName.innerHTML += ' <span style="color: #FF6B6B;">💰 Priority Based Budgeting City!</span>';
+            // Add special location badges
+            if (gameState.currentCity.type === 'tyler-major') {
+                locationName.innerHTML += '<br><span style="color: #0066CC; font-size: 14px;">🏢 Tyler Technologies HQ! (+50 pts)</span>';
+            } else if (gameState.currentCity.type === 'tyler') {
+                locationName.innerHTML += '<br><span style="color: #0066CC; font-size: 14px;">🏢 Tyler Office (+10 pts)</span>';
+            } else if (gameState.currentCity.type === 'pbb') {
+                locationName.innerHTML += '<br><span style="color: #e74c3c; font-size: 14px;">💰 Priority Based Budgeting City! (+25 pts)</span>';
             }
             
             modal.classList.add('show');
@@ -991,7 +1267,7 @@
             
             // Add logos if special location
             if (city.type === 'tyler' || city.type === 'tyler-major') {
-                addLogo('tyler', 'T');
+                addLogo('tyler', 'TYLER');
             }
             if (city.type === 'pbb') {
                 addLogo('resourcex', 'RX');
@@ -999,7 +1275,7 @@
             
             // Update server
             try {
-                const response = await fetch('/api/score', {
+                await fetch('/api/score', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1009,28 +1285,26 @@
                     })
                 });
                 
-                const data = await response.json();
                 updateLeaderboard();
             } catch (error) {
                 console.error('Score update failed:', error);
             }
             
             closeSelfieModal();
-            
-            // Celebration effect
             createConfetti();
         }
 
         // Show Points Animation
         function showPointsAnimation(points) {
+            const mapDiv = document.getElementById('googleMap');
             const avatar = document.getElementById('avatar');
             const popup = document.createElement('div');
             popup.className = 'points-popup';
-            popup.textContent = `+${points} points!`;
+            popup.textContent = `+${points}`;
             popup.style.left = avatar.style.left;
             popup.style.top = avatar.style.top;
             
-            document.getElementById('worldMap').appendChild(popup);
+            mapDiv.appendChild(popup);
             
             setTimeout(() => popup.remove(), 2000);
         }
@@ -1043,28 +1317,28 @@
             logo.textContent = text;
             logoQueue.appendChild(logo);
             
-            // Remove after 10 seconds
             setTimeout(() => logo.remove(), 10000);
         }
 
         // Create Confetti
         function createConfetti() {
-            const colors = ['#FFD700', '#FF6B6B', '#667eea', '#00C851', '#0066CC'];
-            for (let i = 0; i < 30; i++) {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#27ae60', '#9b59b6'];
+            for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
-                    confetti.style.position = 'absolute';
+                    confetti.style.position = 'fixed';
                     confetti.style.width = '10px';
                     confetti.style.height = '10px';
                     confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
                     confetti.style.left = Math.random() * 100 + '%';
                     confetti.style.top = '-10px';
-                    confetti.style.zIndex = '1000';
+                    confetti.style.zIndex = '3000';
+                    confetti.style.borderRadius = '50%';
                     confetti.style.animation = 'fall 3s linear forwards';
                     document.body.appendChild(confetti);
                     
                     setTimeout(() => confetti.remove(), 3000);
-                }, i * 50);
+                }, i * 30);
             }
         }
 
@@ -1073,7 +1347,7 @@
         style.textContent = `
             @keyframes fall {
                 to {
-                    transform: translateY(100vh) rotate(360deg);
+                    transform: translateY(110vh) rotate(720deg);
                     opacity: 0;
                 }
             }
@@ -1089,7 +1363,7 @@
                 const leaderboardList = document.getElementById('leaderboardList');
                 leaderboardList.innerHTML = '';
                 
-                leaderboard.forEach((player, index) => {
+                leaderboard.slice(0, 20).forEach((player, index) => {
                     const entry = document.createElement('div');
                     entry.className = 'leaderboard-entry';
                     if (index === 0) entry.classList.add('gold');
@@ -1097,7 +1371,7 @@
                     if (index === 2) entry.classList.add('bronze');
                     
                     entry.innerHTML = `
-                        <span class="rank">#${index + 1}</span>
+                        <span class="rank">${index + 1}</span>
                         <span class="player-name">${player.name}</span>
                         <span class="player-score">${player.score}</span>
                     `;
@@ -1106,7 +1380,7 @@
                 });
                 
                 if (leaderboard.length === 0) {
-                    leaderboardList.innerHTML = '<div class="leaderboard-entry"><span class="player-name">No players yet...</span></div>';
+                    leaderboardList.innerHTML = '<div class="leaderboard-entry"><span class="player-name">Be the first!</span></div>';
                 }
             } catch (error) {
                 console.error('Leaderboard update failed:', error);
@@ -1115,7 +1389,7 @@
 
         // Share to LinkedIn
         function shareToLinkedIn() {
-            const text = `🏛️ I just scored ${gameState.score} points in the City Hall Selfie Game! Join me for ELGL's City Hall Selfie Day and see if you can beat my score! #CityHallSelfie #ELGL #LocalGov`;
+            const text = `🏛️ I scored ${gameState.score} points in the City Hall Selfie Game for ELGL's 10th Anniversary City Hall Selfie Day! Can you beat my score? #CityHallSelfie #ELGL #LocalGov #August12`;
             const url = window.location.href;
             
             const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
@@ -1127,27 +1401,62 @@
             document.getElementById('selfieModal').classList.remove('show');
         }
 
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && document.getElementById('gameContainer').style.display === 'block') {
-                searchLocation();
-            }
-        });
+        // Show/Hide Loading
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
 
-        // Auto-refresh leaderboard every 30 seconds
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // Initialize map on load
+        window.onload = function() {
+            // Initialize Google Maps
+            if (typeof google !== 'undefined') {
+                initMap();
+            } else {
+                console.log('Google Maps not loaded. Add your API key.');
+                // Fallback to static map
+            }
+        };
+
+        // Auto-refresh leaderboard
         setInterval(() => {
             if (document.getElementById('gameContainer').style.display === 'block') {
                 updateLeaderboard();
             }
         }, 30000);
 
-        // Prevent form submission on enter in search box
-        document.getElementById('locationSearch').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchLocation();
+        // Handle enter key in search
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('locationSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchLocation();
+                    }
+                });
             }
         });
+    </script>
+
+    <!-- Initialize Google Maps -->
+    <script>
+        // Note: Replace YOUR_API_KEY with actual Google Maps API key
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCOcjnPhgtkTfIIxzGcQlyCZqosaWFsLBY&libraries=places&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+        
+        // For demo without API key, use fallback
+        if (!window.location.href.includes('localhost')) {
+            loadGoogleMaps(); // Now active with API key
+        }
     </script>
 </body>
 </html>
