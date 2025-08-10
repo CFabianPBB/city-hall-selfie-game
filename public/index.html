@@ -1070,6 +1070,15 @@
         <!-- Logo Queue -->
         <div class="logo-queue" id="logoQueue"></div>
 
+        <!-- My Selfies Button -->
+        <button class="my-selfies-btn" onclick="showMySelfies()">My Selfies</button>
+
+        <!-- Community Reel -->
+        <div class="community-reel">
+            <div class="reel-title">Community Selfies</div>
+            <div class="reel-container" id="communityReel"></div>
+        </div>
+
         <!-- Control Panel -->
         <div class="control-panel">
             <div class="search-box">
@@ -1132,6 +1141,17 @@
             ELGL Local Government Leader
         </div>
         <button onclick="closeInfluencerModal()">AWESOME!</button>
+    </div>
+
+    <!-- Selfies Gallery Modal -->
+    <div class="selfies-gallery-modal" id="selfiesGallery">
+        <div class="gallery-content">
+            <div class="gallery-header">
+                <h2 class="gallery-title">My City Hall Selfies</h2>
+                <button class="close-gallery" onclick="closeSelfiesGallery()">CLOSE</button>
+            </div>
+            <div class="selfies-grid" id="selfiesGrid"></div>
+        </div>
     </div>
 
     <!-- Background Music -->
@@ -1266,9 +1286,11 @@
             { name: "Stephanie McElroy", location: "Ypsilanti, MI", initials: "SM", color: "#DA70D6" }
         ];
 
-        // Add influencers found tracking
+        // Add to game state
         gameState.influencersFound = [];
         gameState.influencersOnMap = [];
+        gameState.mySelfies = [];
+        gameState.communitySelfies = [];
         const specialCities = {
             // Tyler Major Offices - 50 points
             'plano': { type: 'tyler-major', points: 50, lat: 33.0198, lng: -96.6989 },
@@ -1444,6 +1466,12 @@
             
             // Spawn some influencers on the map!
             spawnInfluencers();
+            
+            // Spawn city pins for Tyler and PBB cities
+            spawnCityPins();
+            
+            // Load community selfies
+            loadCommunitySelfies();
             
             // Position avatar at center of map
             if (gameState.googleMapsLoaded && gameState.map) {

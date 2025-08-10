@@ -19,6 +19,7 @@ app.use(express.static('public'));
 // In-memory storage for game data
 let players = [];
 let leaderboard = [];
+let communitySelfies = [];
 
 // Email configuration (optional - will work without it)
 const transporter = nodemailer.createTransport({
@@ -89,9 +90,9 @@ app.post('/api/register', async (req, res) => {
     res.json({ success: true, player });
 });
 
-// Update score
+// Update score and save selfie
 app.post('/api/score', (req, res) => {
-    const { playerId, points, location } = req.body;
+    const { playerId, points, location, selfie } = req.body;
     
     const player = players.find(p => p.id === playerId);
     if (player) {
@@ -104,12 +105,38 @@ app.post('/api/score', (req, res) => {
         
         // Sort leaderboard
         leaderboard.sort((a, b) => b.score - a.score);
+        
+        // Save selfie to community reel
+        if (selfie) {
+            communitySelfies.unshift({
+                ...selfie,
+                playerId: playerId,
+                timestamp: new Date()
+            });
+            
+            // Keep only last 50 community selfies
+            if (communitySelfies.length > 50) {
+                communitySelfies = communitySelfies.slice(0, 50);
+            }
+        }
     }
     
     res.json({ 
         success: true, 
         newScore: player ? player.score : 0,
         leaderboard: leaderboard.slice(0, 20)
+    });
+});
+
+// Get community selfies
+app.get('/api/community-selfies', (req, res) => {
+    res.json({ 
+        selfies: communitySelfies.slice(0, 20).map(s => ({
+            playerName: s.playerName,
+            location: s.location,
+            backgroundImage: s.backgroundImage,
+            timestamp: s.timestamp
+        }))
     });
 });
 
