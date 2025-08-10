@@ -36,8 +36,19 @@ app.get('/', (req, res) => {
 
 // NEW ROUTE: Serve Google Maps API Key securely
 app.get('/api/google-maps-key', (req, res) => {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_PLACEHOLDER';
-    res.json({ key: apiKey });
+    // Get the API key from environment variable
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    
+    // Check if the key exists and is not a placeholder
+    if (apiKey && apiKey !== 'YOUR_API_KEY_PLACEHOLDER' && apiKey !== '') {
+        res.json({ key: apiKey });
+    } else {
+        // Return error if no valid key
+        res.status(500).json({ 
+            error: 'Google Maps API key not configured',
+            key: null 
+        });
+    }
 });
 
 // Register new player

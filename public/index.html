@@ -1031,28 +1031,38 @@
         // Load Google Maps API dynamically and securely
         async function loadGoogleMapsAPI() {
             try {
+                console.log('Fetching Google Maps API key...');
                 // Fetch the API key from the server
                 const response = await fetch('/api/google-maps-key');
                 const data = await response.json();
                 
-                if (data.key && data.key !== 'YOUR_API_KEY_PLACEHOLDER') {
+                console.log('API key response:', data);
+                
+                if (data.key && data.key !== 'YOUR_API_KEY_PLACEHOLDER' && data.key !== '') {
+                    console.log('Loading Google Maps with API key...');
                     // Create and load the Google Maps script
                     const script = document.createElement('script');
                     script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&libraries=places&callback=initMap`;
                     script.async = true;
                     script.defer = true;
                     script.onerror = function() {
-                        console.error('Failed to load Google Maps');
+                        console.error('Failed to load Google Maps script');
                         gameState.googleMapsLoaded = false;
+                        // Show game without map
+                        document.getElementById('googleMap').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; background: #87CEEB; color: #2c3e50; font-family: Orbitron, sans-serif; font-size: 18px;">Map loading... Game still playable!</div>';
                     };
                     document.head.appendChild(script);
                 } else {
-                    console.log('Google Maps API key not configured');
+                    console.warn('Google Maps API key not configured on server');
                     gameState.googleMapsLoaded = false;
+                    // Show game without map but still playable
+                    document.getElementById('googleMap').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; background: linear-gradient(135deg, #87CEEB 0%, #98D8C8 100%); color: #2c3e50; font-family: Orbitron, sans-serif; font-size: 18px; text-align: center; padding: 20px;"><div><h2 style="font-family: Press Start 2P, cursive; margin-bottom: 20px;">Map Unavailable</h2><p>But the game still works! Search for cities to take selfies!</p></div></div>';
                 }
             } catch (error) {
                 console.error('Failed to fetch API key:', error);
                 gameState.googleMapsLoaded = false;
+                // Show game without map
+                document.getElementById('googleMap').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; background: linear-gradient(135deg, #87CEEB 0%, #98D8C8 100%); color: #2c3e50; font-family: Orbitron, sans-serif; font-size: 18px;">Game ready! Search for cities!</div>';
             }
         }
 
