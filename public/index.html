@@ -1616,21 +1616,8 @@
     </div>
 
     <!-- Background Music -->
-    <audio id="bgMusic" loop volume="0.3">
-        <!-- Using a free, royalty-free SimCity-style music track -->
-        <source src="https://www.soundjay.com/misc/sounds-651.wav" type="audio/wav">
-        <!-- Fallback: Generate our own simple audio -->
-    </audio>
-
-    <!-- Sound Effects -->
-    <audio id="snapSound" preload="auto" volume="0.5">
-        <!-- Camera snap sound -->
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYUBjiR2/LNdygFJHfH8N2QQAoUXrTp66hVFA==" type="audio/wav">
-    </audio>
-
-    <audio id="confettiSound" preload="auto" volume="0.4">
-        <!-- Celebration sound -->
-        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YU" type="audio/wav">
+    <audio id="bgMusic" loop>
+        <source src="data:audio/mpeg;base64,SUQzAwAAAAAAIVRYWFgAAAANAAAAU29mdHdhcmUAR2FyYWdlQmFuZABUWFhYAAAADwAAAGNvbW1lbnQAQ29tbWVudAD/80DEAAAAA0gAAAAATEFNRTMuOTlyAQAB">
     </audio>
 
     <script>
@@ -1938,8 +1925,8 @@
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'block';
             
-            // Play background music with user interaction
-            playBackgroundMusic();
+            // Play background music
+            document.getElementById('bgMusic').play().catch(e => console.log('Audio autoplay blocked'));
             
             // Load leaderboard
             updateLeaderboard();
@@ -2156,7 +2143,6 @@
         // Close influencer modal
         function closeInfluencerModal() {
             document.getElementById('influencerModal').classList.remove('show');
-            playConfettiSound(); // Celebration sound
             createConfetti();
         }
 
@@ -2468,7 +2454,6 @@
             }
             
             closeSelfieModal();
-            playSnapSound(); // Camera snap sound
             createConfetti();
         }
 
@@ -2825,8 +2810,6 @@
 
         // Create Confetti
         function createConfetti() {
-            playConfettiSound(); // Celebration sound
-            
             const colors = ['#f1c40f', '#e74c3c', '#3498db', '#27ae60', '#9b59b6'];
             for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
@@ -2952,122 +2935,7 @@
             }
         }
 
-        // Background music and sound effects
-        function playBackgroundMusic() {
-            // Create a simple, pleasant background tune using Web Audio API
-            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-                createSimCityStyleMusic();
-            } else {
-                console.log('Web Audio API not supported');
-            }
-        }
-
-        function createSimCityStyleMusic() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = new AudioContext();
-                
-                // Resume audio context on user interaction
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                
-                // Create a simple, cheerful melody loop
-                const playNote = (frequency, startTime, duration, volume = 0.1) => {
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    oscillator.frequency.setValueAtTime(frequency, startTime);
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0, startTime);
-                    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-                    
-                    oscillator.start(startTime);
-                    oscillator.stop(startTime + duration);
-                };
-                
-                // Simple melody: C-E-G-C pattern (cheerful and civic-sounding)
-                const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
-                const beatDuration = 0.5;
-                
-                const playMelody = () => {
-                    const now = audioCtx.currentTime;
-                    notes.forEach((note, index) => {
-                        playNote(note, now + index * beatDuration, beatDuration * 0.8, 0.08);
-                    });
-                };
-                
-                // Play melody every 3 seconds for a peaceful background
-                playMelody();
-                setInterval(playMelody, 3000);
-                
-                console.log('SimCity-style background music started');
-            } catch (error) {
-                console.log('Could not create background music:', error);
-            }
-        }
-
-        function playSnapSound() {
-            try {
-                // Create camera snap sound
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = new AudioContext();
-                
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                // Sharp, quick sound for camera snap
-                oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
-                oscillator.type = 'square';
-                
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-                
-                oscillator.start(audioCtx.currentTime);
-                oscillator.stop(audioCtx.currentTime + 0.1);
-            } catch (error) {
-                console.log('Could not play snap sound:', error);
-            }
-        }
-
-        function playConfettiSound() {
-            try {
-                // Create celebration sound
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = new AudioContext();
-                
-                // Multiple ascending tones for celebration
-                const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-                
-                frequencies.forEach((freq, index) => {
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.1);
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + index * 0.1);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.1 + 0.3);
-                    
-                    oscillator.start(audioCtx.currentTime + index * 0.1);
-                    oscillator.stop(audioCtx.currentTime + index * 0.1 + 0.3);
-                });
-            } catch (error) {
-                console.log('Could not play confetti sound:', error);
-            }
-        }
+        // Initialize on page load
         window.addEventListener('load', function() {
             // Load Google Maps API securely
             loadGoogleMapsAPI();
