@@ -2443,13 +2443,16 @@
             modal.classList.add('show');
         }
 
-        // Take Selfie
+        // Take Selfie - Updated to use async image capture
         async function takeSelfie() {
             const city = gameState.currentCity;
             let points = city.points;
             
-            // Capture the selfie image before closing the modal
-            const selfieCanvas = captureSelfieImage();
+            // Show loading while capturing image
+            showLoading('Capturing your selfie...');
+            
+            // Capture the selfie image (now async)
+            const selfieCanvas = await captureSelfieImage();
             
             // Save the selfie to gameState
             const selfie = {
@@ -2462,7 +2465,9 @@
             };
             
             gameState.mySelfies.push(selfie);
-            console.log('Selfie saved:', selfie.location);
+            console.log('Selfie saved:', selfie.location, 'Image size:', selfieCanvas.length);
+            
+            hideLoading();
             
             // Show points animation
             showPointsAnimation(points);
@@ -2510,91 +2515,190 @@
             createConfetti();
         }
 
-        // Capture selfie image from the modal
-        function captureSelfieImage() {
-            try {
-                // Create a canvas to capture the selfie preview
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const selfiePreview = document.getElementById('selfieBackground');
-                
-                // Set canvas size
-                canvas.width = 600;
-                canvas.height = 400;
-                
-                // Get the background image
-                const bgStyle = selfiePreview.style.backgroundImage;
-                
-                if (bgStyle && bgStyle.includes('url(')) {
-                    // Extract URL from background-image style
-                    const imageUrl = bgStyle.slice(5, -2); // Remove 'url("' and '")'
+        // Enhanced selfie capture with real background images
+        async function captureSelfieImage() {
+            return new Promise((resolve) => {
+                try {
+                    // Create a canvas to capture the selfie preview
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const selfiePreview = document.getElementById('selfieBackground');
                     
-                    // Create image element to draw
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
+                    // Set canvas size to match modal
+                    canvas.width = 600;
+                    canvas.height = 400;
                     
-                    // For now, return a simple data URL with the location info
-                    // In a real implementation, you'd wait for the image to load
-                    ctx.fillStyle = '#87CEEB';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    // Get the background image
+                    const bgStyle = selfiePreview.style.backgroundImage;
                     
-                    // Add location text
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.font = 'bold 24px Orbitron';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('City Hall Selfie', canvas.width/2, 50);
-                    
-                    ctx.font = '18px Orbitron';
-                    ctx.fillText(gameState.currentCity.name, canvas.width/2, 100);
-                    
-                    // Add date
-                    ctx.font = '14px Orbitron';
-                    ctx.fillText(new Date().toLocaleDateString(), canvas.width/2, 350);
-                    
-                    // Add ELGL logo area
-                    ctx.fillStyle = '#27ae60';
-                    ctx.fillRect(450, 20, 120, 80);
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('ELGL', 510, 50);
-                    ctx.font = '10px Arial';
-                    ctx.fillText('10th Anniversary', 510, 70);
-                    ctx.fillText('City Hall Selfie', 510, 85);
-                    
-                    return canvas.toDataURL('image/png');
-                } else {
-                    // Fallback if no background image
-                    ctx.fillStyle = '#87CEEB';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.font = 'bold 24px Orbitron';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('City Hall Selfie', canvas.width/2, canvas.height/2);
-                    
-                    return canvas.toDataURL('image/png');
+                    if (bgStyle && bgStyle.includes('url(')) {
+                        // Extract URL from background-image style
+                        let imageUrl = bgStyle.slice(5, -2); // Remove 'url("' and '")'
+                        if (imageUrl.startsWith('"') && imageUrl.endsWith('"')) {
+                            imageUrl = imageUrl.slice(1, -1);
+                        }
+                        
+                        console.log('Capturing selfie with background:', imageUrl);
+                        
+                        // Create image element to draw the city hall background
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        
+                        img.onload = function() {
+                            // Draw the city hall background
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
+                            // Add semi-transparent overlay for better text readability
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            
+                            // Draw the selfie elements
+                            drawSelfieElements(ctx, canvas);
+                            
+                            resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        };
+                        
+                        img.onerror = function() {
+                            console.log('Failed to load background image, using fallback');
+                            // Use fallback design
+                            drawFallbackSelfie(ctx, canvas);
+                            resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        };
+                        
+                        img.src = imageUrl;
+                        
+                        // Timeout fallback
+                        setTimeout(() => {
+                            if (!img.complete) {
+                                console.log('Image load timeout, using fallback');
+                                drawFallbackSelfie(ctx, canvas);
+                                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                            }
+                        }, 3000);
+                        
+                    } else {
+                        // No background image, use fallback
+                        drawFallbackSelfie(ctx, canvas);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    }
+                } catch (error) {
+                    console.error('Error capturing selfie:', error);
+                    // Emergency fallback
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 600;
+                    canvas.height = 400;
+                    drawFallbackSelfie(ctx, canvas);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
                 }
-            } catch (error) {
-                console.error('Error capturing selfie:', error);
-                // Return a simple placeholder image
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 600;
-                canvas.height = 400;
+            });
+        }
+
+        // Draw selfie elements (avatar, text, ELGL branding)
+        function drawSelfieElements(ctx, canvas) {
+            const cityName = gameState.currentCity.name;
+            const today = new Date().toLocaleDateString();
+            
+            // Draw player avatar if available
+            if (gameState.playerPhoto) {
+                const avatarImg = new Image();
+                avatarImg.onload = function() {
+                    // Draw circular avatar in bottom center
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(canvas.width/2, canvas.height - 100, 50, 0, 2 * Math.PI);
+                    ctx.clip();
+                    ctx.drawImage(avatarImg, canvas.width/2 - 50, canvas.height - 150, 100, 100);
+                    ctx.restore();
+                    
+                    // Draw white border around avatar
+                    ctx.beginPath();
+                    ctx.arc(canvas.width/2, canvas.height - 100, 52, 0, 2 * Math.PI);
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                };
+                avatarImg.src = gameState.playerPhoto;
+            } else {
+                // Draw default avatar circle
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height - 100, 50, 0, 2 * Math.PI);
+                ctx.fillStyle = '#3498db';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 4;
+                ctx.stroke();
                 
-                ctx.fillStyle = '#87CEEB';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 24px Orbitron';
+                // Add initials
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('City Hall Selfie', canvas.width/2, canvas.height/2);
-                ctx.font = '18px Orbitron';
-                ctx.fillText(gameState.currentCity.name, canvas.width/2, canvas.height/2 + 40);
-                
-                return canvas.toDataURL('image/png');
+                ctx.fillText(gameState.playerName.charAt(0).toUpperCase(), canvas.width/2, canvas.height - 90);
             }
+            
+            // Draw location text with background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(20, canvas.height - 60, canvas.width - 40, 40);
+            
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(cityName, canvas.width/2, canvas.height - 35);
+            
+            ctx.font = '14px Arial';
+            ctx.fillText(today, canvas.width/2, canvas.height - 15);
+            
+            // Draw ELGL branding
+            drawELGLBranding(ctx, canvas);
+        }
+
+        // Draw ELGL branding in corner
+        function drawELGLBranding(ctx, canvas) {
+            // ELGL logo background
+            ctx.fillStyle = 'rgba(39, 174, 96, 0.95)';
+            ctx.fillRect(canvas.width - 150, 10, 140, 90);
+            
+            // ELGL text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('ELGL', canvas.width - 80, 40);
+            
+            ctx.font = '12px Arial';
+            ctx.fillText('10th Anniversary', canvas.width - 80, 58);
+            ctx.fillText('City Hall Selfie', canvas.width - 80, 75);
+            ctx.fillText('August 12, 2025', canvas.width - 80, 90);
+        }
+
+        // Fallback selfie design
+        function drawFallbackSelfie(ctx, canvas) {
+            // Beautiful gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.5, '#98D8C8');
+            gradient.addColorStop(1, '#B0E0E6');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw city hall silhouette
+            ctx.fillStyle = 'rgba(44, 62, 80, 0.3)';
+            ctx.fillRect(200, 100, 200, 150);
+            
+            // Draw triangle roof
+            ctx.beginPath();
+            ctx.moveTo(180, 100);
+            ctx.lineTo(300, 50);
+            ctx.lineTo(420, 100);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw columns
+            for (let i = 0; i < 4; i++) {
+                ctx.fillRect(220 + i * 40, 120, 20, 130);
+            }
+            
+            // Draw selfie elements
+            drawSelfieElements(ctx, canvas);
         }
 
         // Show Points Animation
@@ -2692,9 +2796,10 @@
             document.getElementById('selfieModal').classList.remove('show');
         }
 
-        // Show/Hide Loading
-        function showLoading() {
+        // Show/Hide Loading - Enhanced with custom messages
+        function showLoading(message = 'Loading City Hall...') {
             document.getElementById('loadingOverlay').classList.add('show');
+            document.querySelector('.loading-text').textContent = message;
         }
 
         function hideLoading() {
