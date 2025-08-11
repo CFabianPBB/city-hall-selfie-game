@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>City Hall Selfie - The Game! | ELGL 10th Anniversary</title>
     
     <!-- NO API KEY HERE - Will be loaded dynamically -->
@@ -21,6 +23,192 @@
             overflow: hidden;
             background: #4a90e2;
             font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            /* Start screen mobile adjustments */
+            .start-container {
+                max-width: 95%;
+                padding: 20px;
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .game-title {
+                font-size: 18px;
+            }
+
+            /* Game container mobile */
+            #gameContainer {
+                touch-action: pan-x pan-y;
+            }
+
+            /* Google Map mobile */
+            #googleMap {
+                touch-action: pan-x pan-y pinch-zoom;
+            }
+
+            /* Score display mobile */
+            .score-display {
+                top: 5px;
+                left: 5px;
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
+            .score-value {
+                font-size: 16px;
+            }
+
+            /* Instructions mobile */
+            .instructions-toggle {
+                top: 35px;
+                left: 5px;
+                padding: 4px 8px;
+                font-size: 8px;
+            }
+
+            /* Leaderboard mobile */
+            .leaderboard {
+                width: 200px;
+                max-height: 300px;
+                top: 10px;
+                right: 10px;
+                padding: 10px;
+            }
+
+            .leaderboard h3 {
+                font-size: 11px;
+            }
+
+            /* Control panel mobile */
+            .control-panel {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                padding: 10px;
+                transform: none;
+            }
+
+            .search-box {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .search-box input {
+                width: 100%;
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .go-btn {
+                width: 100%;
+                padding: 10px;
+                font-size: 10px;
+            }
+
+            /* Influencer counter mobile */
+            .influencer-counter {
+                top: 70px;
+                right: 10px;
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            .influencer-counter-value {
+                font-size: 16px;
+            }
+
+            /* Community reel mobile */
+            .community-reel {
+                display: none; /* Hide on mobile to save space */
+            }
+
+            /* My selfies button mobile */
+            .my-selfies-btn {
+                bottom: 120px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 8px;
+            }
+
+            /* Selfie modal mobile */
+            .selfie-content {
+                max-width: 95%;
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .selfie-preview {
+                width: 100%;
+                max-width: 350px;
+                height: 250px;
+            }
+
+            .selfie-title {
+                font-size: 14px;
+            }
+
+            .modal-btn {
+                padding: 8px 15px;
+                font-size: 10px;
+            }
+
+            /* Gallery modal mobile */
+            .gallery-content {
+                padding: 15px;
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .selfies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+
+            /* Logo queue mobile */
+            .logo-queue {
+                bottom: 90px;
+                left: 10px;
+                flex-wrap: wrap;
+                max-width: 150px;
+            }
+
+            .logo-item {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+        }
+
+        /* iOS-specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            #gameContainer {
+                position: fixed;
+                height: 100vh;
+                height: -webkit-fill-available;
+            }
+
+            .start-container {
+                -webkit-overflow-scrolling: touch;
+                overflow-y: scroll;
+            }
+
+            .selfie-modal, .selfies-gallery-modal {
+                -webkit-overflow-scrolling: touch;
+                overflow-y: auto;
+            }
         }
 
         /* Start Screen with SimCity Style */
@@ -2163,6 +2351,33 @@
         window.addEventListener('load', function() {
             // Load Google Maps API securely
             loadGoogleMapsAPI();
+            
+            // Mobile touch handling
+            if ('ontouchstart' in window) {
+                document.addEventListener('touchmove', function(e) {
+                    // Allow scrolling on specific elements
+                    if (e.target.closest('.start-container') || 
+                        e.target.closest('.selfies-gallery-modal') ||
+                        e.target.closest('.gallery-content') ||
+                        e.target.closest('.leaderboard') ||
+                        e.target.closest('#googleMap')) {
+                        return;
+                    }
+                    // Prevent default scrolling on other elements
+                    if (e.target.closest('#gameContainer')) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                // Fix iOS viewport height
+                const setVH = () => {
+                    const vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh', `${vh}px`);
+                };
+                setVH();
+                window.addEventListener('resize', setVH);
+                window.addEventListener('orientationchange', setVH);
+            }
         });
 
         // Auto-refresh leaderboard
