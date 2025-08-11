@@ -31,30 +31,36 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Mobile-specific adjustments */
+        /* Mobile-first responsive design */
         @media (max-width: 768px) {
             /* Start screen mobile adjustments */
             .start-container {
                 max-width: 95%;
-                padding: 20px;
-                margin: 10px;
-                max-height: 90vh;
+                padding: 15px;
+                margin: 5px;
+                max-height: 95vh;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
             .game-title {
-                font-size: 18px;
+                font-size: 16px;
+                line-height: 1.3;
             }
 
             /* Game container mobile */
             #gameContainer {
                 touch-action: pan-x pan-y;
+                position: relative;
+                height: 100vh;
+                width: 100vw;
             }
 
             /* Google Map mobile */
             #googleMap {
                 touch-action: pan-x pan-y pinch-zoom;
+                height: 100%;
+                width: 100%;
             }
 
             /* Hide avatar on mobile to reduce clutter */
@@ -62,22 +68,30 @@
                 display: none;
             }
 
-            /* Score display mobile - tiny top left */
+            /* Score display mobile - compact top left */
             .score-display {
-                top: 5px;
-                left: 5px;
-                padding: 4px 6px;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
                 font-size: 10px;
-                background: rgba(0, 0, 0, 0.8);
-                border-radius: 3px;
+                background: rgba(0, 0, 0, 0.85);
+                border-radius: 8px;
+                color: white;
+                z-index: 300;
+                border: 2px solid #f1c40f;
+                min-width: 80px;
             }
 
             .score-label {
-                display: none; /* Hide label on mobile */
+                font-size: 10px;
+                margin-bottom: 2px;
             }
 
             .score-value {
-                font-size: 14px;
+                font-size: 18px;
+                font-family: 'Press Start 2P', cursive;
+                color: #f1c40f;
             }
 
             /* Hide instructions completely on mobile */
@@ -89,133 +103,186 @@
                 display: none !important;
             }
 
-            /* Leaderboard mobile - smaller and moveable */
+            /* Leaderboard mobile - much smaller and positioned better */
             .leaderboard {
-                width: 160px;
-                max-height: 150px;
-                top: 35px;
-                right: 5px;
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 140px;
+                max-height: 120px;
                 padding: 8px;
-                background: rgba(255, 255, 255, 0.9);
-                font-size: 10px;
+                background: rgba(255, 255, 255, 0.95);
+                font-size: 9px;
+                border-radius: 8px;
+                z-index: 300;
+                border: 2px solid #2c3e50;
+                overflow-y: auto;
             }
 
             .leaderboard h3 {
                 font-size: 10px;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
+                text-align: center;
+                font-family: 'Press Start 2P', cursive;
             }
 
             .leaderboard-entry {
-                padding: 4px;
-                margin-bottom: 3px;
-                font-size: 9px;
+                padding: 3px;
+                margin-bottom: 2px;
+                font-size: 8px;
+                border-radius: 3px;
             }
 
             .rank {
-                font-size: 10px;
-                width: 20px;
+                font-size: 9px;
+                width: 15px;
+                font-family: 'Press Start 2P', cursive;
             }
 
             .player-name {
-                font-size: 9px;
+                font-size: 8px;
+                max-width: 60px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
             .player-score {
-                font-size: 10px;
+                font-size: 9px;
+                font-family: 'Press Start 2P', cursive;
             }
 
-            /* Control panel mobile - bottom of screen */
+            /* Control panel mobile - bottom of screen, more compact */
             .control-panel {
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                padding: 8px;
+                padding: 12px 8px;
                 transform: none;
                 background: rgba(255, 255, 255, 0.95);
-                border-radius: 10px 10px 0 0;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+                border-radius: 12px 12px 0 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+                z-index: 300;
+                border-top: 3px solid #2c3e50;
             }
 
             .search-box {
                 flex-direction: row;
-                gap: 5px;
+                gap: 8px;
+                align-items: center;
             }
 
             .search-box input {
                 flex: 1;
                 font-size: 14px;
-                padding: 8px;
+                padding: 10px;
+                border: 2px solid #2c3e50;
+                border-radius: 6px;
             }
 
             .go-btn {
                 width: auto;
-                padding: 8px 15px;
-                font-size: 9px;
+                padding: 10px 16px;
+                font-size: 10px;
+                font-family: 'Press Start 2P', cursive;
+                white-space: nowrap;
             }
 
-            /* Influencer counter mobile - make it smaller */
+            /* Influencer counter mobile - top center */
             .influencer-counter {
                 position: fixed;
-                bottom: 60px;
-                right: 5px;
-                padding: 5px 8px;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 6px 10px;
                 font-size: 9px;
-                background: rgba(155, 89, 182, 0.9);
+                background: rgba(155, 89, 182, 0.95);
+                border-radius: 8px;
+                z-index: 300;
+                border: 2px solid #8e44ad;
+                color: white;
+                text-align: center;
+                min-width: 100px;
             }
 
             .influencer-counter-value {
-                font-size: 14px;
+                font-size: 16px;
+                font-family: 'Press Start 2P', cursive;
+                color: #f1c40f;
+                display: block;
             }
 
-            .influencer-counter-label,
+            .influencer-counter-label {
+                font-size: 8px;
+                display: block;
+                margin-bottom: 2px;
+            }
+
             .influencer-counter-total {
-                display: none; /* Hide text, just show number */
+                font-size: 8px;
+                display: block;
+                margin-top: 2px;
             }
 
-            /* Community reel mobile */
+            /* Community reel - hide on mobile */
             .community-reel {
-                display: none; /* Hide on mobile to save space */
+                display: none;
             }
 
-            /* My selfies button mobile - bottom left */
+            /* My selfies button mobile - bottom left corner */
             .my-selfies-btn {
                 position: fixed;
-                bottom: 60px;
-                left: 5px;
-                padding: 6px 10px;
-                font-size: 8px;
-                background: rgba(155, 89, 182, 0.9);
+                bottom: 80px;
+                left: 10px;
+                padding: 8px 12px;
+                font-size: 9px;
+                background: rgba(155, 89, 182, 0.95);
+                color: white;
+                border: 2px solid #8e44ad;
+                border-radius: 6px;
+                font-family: 'Press Start 2P', cursive;
+                z-index: 300;
+                cursor: pointer;
             }
 
-            /* Influencer avatars on mobile - make them bigger and easier to tap */
+            /* Influencer avatars on mobile - bigger and more spaced */
             .influencer-avatar {
-                width: 60px;
-                height: 75px;
+                width: 50px;
+                height: 65px;
+                z-index: 250;
             }
 
             .influencer-head {
-                width: 45px;
-                height: 45px;
-                font-size: 14px;
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+                border: 3px solid white;
             }
 
             .influencer-body {
-                width: 35px;
-                height: 30px;
+                width: 30px;
+                height: 25px;
             }
 
-            /* Selfie modal mobile */
+            /* Logo queue mobile - hide to reduce clutter */
+            .logo-queue {
+                display: none;
+            }
+
+            /* Modals mobile */
             .selfie-content {
                 max-width: 95%;
                 padding: 15px;
                 margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .selfie-preview {
                 width: 100%;
-                max-width: 350px;
-                height: 250px;
+                max-width: 300px;
+                height: 200px;
             }
 
             .selfie-title {
@@ -223,8 +290,9 @@
             }
 
             .modal-btn {
-                padding: 8px 15px;
-                font-size: 10px;
+                padding: 8px 12px;
+                font-size: 9px;
+                margin: 5px;
             }
 
             /* Gallery modal mobile */
@@ -237,49 +305,99 @@
             }
 
             .selfies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-            }
-
-            /* Logo queue mobile - bottom right corner */
-            .logo-queue {
-                position: fixed;
-                bottom: 60px;
-                right: 80px;
-                left: auto;
-                flex-direction: row;
-                max-width: 100px;
-                gap: 5px;
-            }
-
-            .logo-item {
-                width: 35px;
-                height: 35px;
-                font-size: 8px;
-                padding: 5px;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 8px;
             }
 
             /* Influencer modal mobile */
             .influencer-modal {
-                padding: 10px;
+                padding: 15px;
+                max-width: 90%;
+                border-radius: 10px;
             }
 
             .influencer-modal h2 {
                 font-size: 14px;
+                margin-bottom: 10px;
             }
 
             .influencer-modal .influencer-name {
                 font-size: 16px;
+                margin: 8px 0;
             }
 
             .influencer-modal .points-earned {
-                font-size: 14px;
-                padding: 8px 15px;
+                font-size: 12px;
+                padding: 8px 12px;
+                margin: 10px 0;
             }
 
             .influencer-modal button {
-                padding: 8px 20px;
-                font-size: 10px;
+                padding: 8px 16px;
+                font-size: 9px;
+            }
+        }
+
+        /* Desktop styles remain the same but with better organization */
+        @media (min-width: 769px) {
+            .score-display {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background: linear-gradient(145deg, #2c3e50, #34495e);
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 
+                    0 0 0 2px #000,
+                    0 5px 20px rgba(0,0,0,0.5);
+                z-index: 200;
+                border: 2px solid #1a252f;
+                color: white;
+            }
+
+            .leaderboard {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 
+                    0 0 0 2px #000,
+                    0 5px 30px rgba(0,0,0,0.5);
+                width: 300px;
+                max-height: 400px;
+                overflow-y: auto;
+                z-index: 200;
+                border: 3px solid #2c3e50;
+            }
+
+            .influencer-counter {
+                position: absolute;
+                top: 20px;
+                right: 340px;
+                background: linear-gradient(145deg, #9b59b6, #8e44ad);
+                padding: 15px;
+                border-radius: 5px;
+                box-shadow: 0 0 0 2px #000, 0 5px 20px rgba(0,0,0,0.5);
+                z-index: 200;
+                color: white;
+                text-align: center;
+            }
+
+            .control-panel {
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 
+                    0 0 0 2px #000,
+                    0 5px 30px rgba(0,0,0,0.5);
+                z-index: 200;
+                border: 3px solid #2c3e50;
             }
         }
 
@@ -583,22 +701,7 @@
         .avatar-legs::before { left: 0; }
         .avatar-legs::after { right: 0; }
 
-        /* Control Panel - SimCity Style */
-        .control-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 
-                0 0 0 2px #000,
-                0 5px 30px rgba(0,0,0,0.5);
-            z-index: 200;
-            border: 3px solid #2c3e50;
-        }
-
+        /* Search Box Styles */
         .search-box {
             display: flex;
             gap: 10px;
@@ -635,22 +738,7 @@
                 3px 3px 0px #000;
         }
 
-        /* Score Display - SimCity Style */
-        .score-display {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(145deg, #2c3e50, #34495e);
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 
-                0 0 0 2px #000,
-                0 5px 20px rgba(0,0,0,0.5);
-            z-index: 200;
-            border: 2px solid #1a252f;
-            color: white;
-        }
-
+        /* Score Display Styles */
         .score-label {
             font-size: 12px;
             margin-bottom: 5px;
@@ -667,24 +755,7 @@
             text-shadow: 2px 2px 0px #000;
         }
 
-        /* Leaderboard - SimCity Style */
-        .leaderboard {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 
-                0 0 0 2px #000,
-                0 5px 30px rgba(0,0,0,0.5);
-            width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 200;
-            border: 3px solid #2c3e50;
-        }
-
+        /* Leaderboard Styles */
         .leaderboard h3 {
             color: #2c3e50;
             margin-bottom: 15px;
@@ -746,6 +817,28 @@
             color: #27ae60;
             font-size: 18px;
             font-family: 'Press Start 2P', cursive;
+        }
+
+        /* Influencer Counter Styles */
+        .influencer-counter-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .influencer-counter-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+            color: #f1c40f;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .influencer-counter-total {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.8;
         }
 
         /* Logo Queue */
@@ -1215,39 +1308,120 @@
             margin-top: 15px;
         }
 
-        /* Influencer Counter - Moved to avoid overlap */
-        .influencer-counter {
-            position: absolute;
-            top: 20px;
-            right: 340px;
-            background: linear-gradient(145deg, #9b59b6, #8e44ad);
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 0 2px #000, 0 5px 20px rgba(0,0,0,0.5);
-            z-index: 200;
+        /* Bounce out animation */
+        @keyframes bounceOut {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* Fall animation for confetti */
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* My Selfies Button */
+        .my-selfies-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
             color: white;
-            text-align: center;
-        }
-
-        .influencer-counter-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            opacity: 0.9;
-        }
-
-        .influencer-counter-value {
+            border: 2px solid #000;
+            border-radius: 5px;
+            cursor: pointer;
             font-family: 'Press Start 2P', cursive;
-            font-size: 20px;
-            color: #f1c40f;
-            text-shadow: 2px 2px 0px #000;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px #000;
         }
 
-        .influencer-counter-total {
+        .my-selfies-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        /* Gallery Modal */
+        .selfies-gallery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selfies-gallery-modal.show {
+            display: flex;
+        }
+
+        .gallery-content {
+            background: linear-gradient(145deg, #ecf0f1, #ffffff);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 
+                0 0 0 3px #000,
+                0 20px 60px rgba(0,0,0,0.5);
+            border: 3px solid #2c3e50;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gallery-title {
+            color: #2c3e50;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+        }
+
+        .close-gallery {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: 2px solid #000;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .selfies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .selfie-item {
+            border: 3px solid #2c3e50;
+            border-radius: 5px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .selfie-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .selfie-item-info {
+            padding: 10px;
+            text-align: center;
+            color: #2c3e50;
             font-size: 12px;
-            margin-top: 5px;
-            opacity: 0.8;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -1321,10 +1495,10 @@
         </div>
 
         <!-- Instructions Toggle -->
-        <button class="instructions-toggle" onclick="toggleInstructions()">HELP</button>
+        <button class="instructions-toggle" onclick="toggleInstructions()" style="display: none;">HELP</button>
 
         <!-- Instructions -->
-        <div class="instructions" id="instructionsPanel">
+        <div class="instructions" id="instructionsPanel" style="display: none;">
             <h4>How to Play</h4>
             <ul>
                 <li>Search for any city worldwide</li>
@@ -1359,7 +1533,7 @@
         <button class="my-selfies-btn" onclick="showMySelfies()">My Selfies</button>
 
         <!-- Community Reel -->
-        <div class="community-reel">
+        <div class="community-reel" style="display: none;">
             <div class="reel-title">Community Selfies</div>
             <div class="reel-container" id="communityReel">
                 <div class="reel-empty">Be the first to take a selfie!</div>
@@ -1462,7 +1636,11 @@
             markers: [],
             geocoder: null,
             placesService: null,
-            googleMapsLoaded: false
+            googleMapsLoaded: false,
+            influencersFound: [],
+            influencersOnMap: [],
+            mySelfies: [],
+            communitySelfies: []
         };
 
         // ELGL Influencers Database - 105 Amazing Local Gov Leaders!
@@ -1508,7 +1686,7 @@
             { name: "Amanda Jarosz", location: "Mesa, AZ", initials: "AJ", color: "#6495ED" },
             { name: "Celia Kupersmith", location: "San Francisco, CA", initials: "CK", color: "#DC143C" },
             { name: "Gwendolyn Kelso", location: "Colorado Springs, CO", initials: "GK", color: "#00FFFF" },
-            { name: "Rachel Scroggins", location: "Olathe, KS", initials: "RS", color: "#00008B" },
+            { name: "Rachel Scroggins", location: "Olathe, KS", initials: "RS", color: "#32CD32" },
             { name: "Jessica Stephens", location: "Frisco, TX", initials: "JS", color: "#008B8B" },
             { name: "Mariann Oshana", location: "Tigard, OR", initials: "MO", color: "#B8860B" },
             { name: "Jesse Kocher", location: "Jefferson County, CO", initials: "JK", color: "#A9A9A9" },
@@ -1573,11 +1751,6 @@
             { name: "Stephanie McElroy", location: "Ypsilanti, MI", initials: "SM", color: "#DA70D6" }
         ];
 
-        // Add to game state
-        gameState.influencersFound = [];
-        gameState.influencersOnMap = [];
-        gameState.mySelfies = [];
-        gameState.communitySelfies = [];
         const specialCities = {
             // Tyler Major Offices - 50 points
             'plano': { type: 'tyler-major', points: 50, lat: 33.0198, lng: -96.6989 },
@@ -1692,7 +1865,7 @@
             // Wait for map to be fully loaded, then spawn pins
             google.maps.event.addListenerOnce(gameState.map, 'idle', function() {
                 console.log('Map is ready, spawning pins...');
-                spawnCityPins();
+                spawnInfluencers();
             });
         }
 
@@ -1994,17 +2167,6 @@
                 }, i * 20);
             }
         }
-
-        // Add bounce out animation
-        const influencerStyle = document.createElement('style');
-        influencerStyle.textContent = `
-            @keyframes bounceOut {
-                0% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.5); opacity: 0.5; }
-                100% { transform: scale(0); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(influencerStyle);
 
         // Search for location
         async function searchLocation() {
@@ -2370,18 +2532,6 @@
             }
         }
 
-        // Add falling animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fall {
-                to {
-                    transform: translateY(110vh) rotate(720deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
         // Update Leaderboard
         async function updateLeaderboard() {
             try {
@@ -2436,6 +2586,54 @@
 
         function hideLoading() {
             document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // My Selfies Gallery Functions
+        function showMySelfies() {
+            const gallery = document.getElementById('selfiesGallery');
+            const grid = document.getElementById('selfiesGrid');
+            
+            // Clear existing content
+            grid.innerHTML = '';
+            
+            if (gameState.mySelfies.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #7f8c8d;">No selfies yet! Start exploring cities to take your first selfie!</div>';
+            } else {
+                gameState.mySelfies.forEach(selfie => {
+                    const item = document.createElement('div');
+                    item.className = 'selfie-item';
+                    item.innerHTML = `
+                        <img src="${selfie.image}" alt="Selfie at ${selfie.location}">
+                        <div class="selfie-item-info">
+                            ${selfie.location}<br>
+                            <small>${selfie.date}</small>
+                        </div>
+                    `;
+                    grid.appendChild(item);
+                });
+            }
+            
+            gallery.classList.add('show');
+        }
+
+        function closeSelfiesGallery() {
+            document.getElementById('selfiesGallery').classList.remove('show');
+        }
+
+        // Load community selfies (placeholder function)
+        function loadCommunitySelfies() {
+            // This would load from server in a real implementation
+            gameState.communitySelfies = [];
+        }
+
+        // Toggle instructions (placeholder function)
+        function toggleInstructions() {
+            const panel = document.getElementById('instructionsPanel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
         }
 
         // Initialize on page load
