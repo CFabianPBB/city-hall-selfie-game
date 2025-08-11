@@ -57,75 +57,120 @@
                 touch-action: pan-x pan-y pinch-zoom;
             }
 
-            /* Score display mobile */
+            /* Hide avatar on mobile to reduce clutter */
+            #avatar {
+                display: none;
+            }
+
+            /* Score display mobile - tiny top left */
             .score-display {
                 top: 5px;
                 left: 5px;
-                padding: 5px 8px;
-                font-size: 12px;
+                padding: 4px 6px;
+                font-size: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                border-radius: 3px;
+            }
+
+            .score-label {
+                display: none; /* Hide label on mobile */
             }
 
             .score-value {
-                font-size: 16px;
+                font-size: 14px;
             }
 
-            /* Instructions mobile */
+            /* Hide instructions completely on mobile */
             .instructions-toggle {
-                top: 35px;
-                left: 5px;
-                padding: 4px 8px;
-                font-size: 8px;
+                display: none;
             }
 
-            /* Leaderboard mobile */
+            .instructions {
+                display: none !important;
+            }
+
+            /* Leaderboard mobile - smaller and moveable */
             .leaderboard {
-                width: 200px;
-                max-height: 300px;
-                top: 10px;
-                right: 10px;
-                padding: 10px;
+                width: 160px;
+                max-height: 150px;
+                top: 35px;
+                right: 5px;
+                padding: 8px;
+                background: rgba(255, 255, 255, 0.9);
+                font-size: 10px;
             }
 
             .leaderboard h3 {
-                font-size: 11px;
+                font-size: 10px;
+                margin-bottom: 8px;
             }
 
-            /* Control panel mobile */
+            .leaderboard-entry {
+                padding: 4px;
+                margin-bottom: 3px;
+                font-size: 9px;
+            }
+
+            .rank {
+                font-size: 10px;
+                width: 20px;
+            }
+
+            .player-name {
+                font-size: 9px;
+            }
+
+            .player-score {
+                font-size: 10px;
+            }
+
+            /* Control panel mobile - bottom of screen */
             .control-panel {
-                bottom: 10px;
-                left: 10px;
-                right: 10px;
-                padding: 10px;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 8px;
                 transform: none;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 10px 10px 0 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
             }
 
             .search-box {
-                flex-direction: column;
-                gap: 8px;
+                flex-direction: row;
+                gap: 5px;
             }
 
             .search-box input {
-                width: 100%;
+                flex: 1;
                 font-size: 14px;
-                padding: 10px;
+                padding: 8px;
             }
 
             .go-btn {
-                width: 100%;
-                padding: 10px;
-                font-size: 10px;
+                width: auto;
+                padding: 8px 15px;
+                font-size: 9px;
             }
 
-            /* Influencer counter mobile */
+            /* Influencer counter mobile - make it smaller */
             .influencer-counter {
-                top: 70px;
-                right: 10px;
-                padding: 8px;
-                font-size: 10px;
+                position: fixed;
+                bottom: 60px;
+                right: 5px;
+                padding: 5px 8px;
+                font-size: 9px;
+                background: rgba(155, 89, 182, 0.9);
             }
 
             .influencer-counter-value {
-                font-size: 16px;
+                font-size: 14px;
+            }
+
+            .influencer-counter-label,
+            .influencer-counter-total {
+                display: none; /* Hide text, just show number */
             }
 
             /* Community reel mobile */
@@ -133,12 +178,31 @@
                 display: none; /* Hide on mobile to save space */
             }
 
-            /* My selfies button mobile */
+            /* My selfies button mobile - bottom left */
             .my-selfies-btn {
-                bottom: 120px;
-                right: 10px;
-                padding: 8px 12px;
+                position: fixed;
+                bottom: 60px;
+                left: 5px;
+                padding: 6px 10px;
                 font-size: 8px;
+                background: rgba(155, 89, 182, 0.9);
+            }
+
+            /* Influencer avatars on mobile - make them bigger and easier to tap */
+            .influencer-avatar {
+                width: 60px;
+                height: 75px;
+            }
+
+            .influencer-head {
+                width: 45px;
+                height: 45px;
+                font-size: 14px;
+            }
+
+            .influencer-body {
+                width: 35px;
+                height: 30px;
             }
 
             /* Selfie modal mobile */
@@ -177,17 +241,44 @@
                 gap: 10px;
             }
 
-            /* Logo queue mobile */
+            /* Logo queue mobile - bottom right corner */
             .logo-queue {
-                bottom: 90px;
-                left: 10px;
-                flex-wrap: wrap;
-                max-width: 150px;
+                position: fixed;
+                bottom: 60px;
+                right: 80px;
+                left: auto;
+                flex-direction: row;
+                max-width: 100px;
+                gap: 5px;
             }
 
             .logo-item {
-                width: 40px;
-                height: 40px;
+                width: 35px;
+                height: 35px;
+                font-size: 8px;
+                padding: 5px;
+            }
+
+            /* Influencer modal mobile */
+            .influencer-modal {
+                padding: 10px;
+            }
+
+            .influencer-modal h2 {
+                font-size: 14px;
+            }
+
+            .influencer-modal .influencer-name {
+                font-size: 16px;
+            }
+
+            .influencer-modal .points-earned {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+
+            .influencer-modal button {
+                padding: 8px 20px;
                 font-size: 10px;
             }
         }
