@@ -225,15 +225,46 @@
                 margin-top: 2px;
             }
 
-            /* Community reel - hide on mobile */
+            /* Community reel - mobile optimized */
             .community-reel {
-                display: none;
+                bottom: 65px;
+                height: 80px;
+            }
+
+            .reel-title {
+                font-size: 8px;
+                padding: 2px 5px;
+            }
+
+            .reel-container {
+                padding: 20px 5px 5px;
+                gap: 10px;
+                animation: scrollReel 40s linear infinite;
+            }
+
+            .reel-item {
+                width: 100px;
+                height: 60px;
+                border-width: 1px;
+            }
+
+            .reel-item-info {
+                font-size: 7px;
+                padding: 3px;
+            }
+
+            .reel-item-player {
+                font-size: 8px;
+            }
+
+            .reel-item-location {
+                font-size: 6px;
             }
 
             /* My selfies button mobile - bottom left corner */
             .my-selfies-btn {
                 position: fixed;
-                bottom: 80px;
+                bottom: 150px;
                 left: 10px;
                 padding: 8px 12px;
                 font-size: 9px;
@@ -888,6 +919,103 @@
             font-size: 14px;
         }
 
+        /* Community Photo Reel */
+        .community-reel {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+            z-index: 190;
+            overflow: hidden;
+            border-top: 3px solid #f1c40f;
+            display: flex;
+            align-items: center;
+        }
+
+        .reel-title {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            text-transform: uppercase;
+            z-index: 191;
+            background: rgba(0,0,0,0.7);
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+
+        .reel-container {
+            display: flex;
+            gap: 15px;
+            padding: 25px 10px 10px;
+            animation: scrollReel 60s linear infinite;
+            align-items: center;
+        }
+
+        @keyframes scrollReel {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .reel-item {
+            flex-shrink: 0;
+            width: 150px;
+            height: 90px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+            position: relative;
+            background: #333;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .reel-item:hover {
+            transform: scale(1.1);
+            z-index: 192;
+        }
+
+        .reel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reel-item-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white;
+            padding: 5px;
+            font-size: 9px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .reel-item-player {
+            font-weight: bold;
+            color: #f1c40f;
+        }
+
+        .reel-item-location {
+            font-size: 8px;
+            opacity: 0.8;
+        }
+
+        .reel-empty {
+            color: rgba(255,255,255,0.5);
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
         /* Selfie Modal */
         .selfie-modal {
             display: none;
@@ -1533,7 +1661,7 @@
         <button class="my-selfies-btn" onclick="showMySelfies()">My Selfies</button>
 
         <!-- Community Reel -->
-        <div class="community-reel" style="display: none;">
+        <div class="community-reel">
             <div class="reel-title">Community Selfies</div>
             <div class="reel-container" id="communityReel">
                 <div class="reel-empty">Be the first to take a selfie!</div>
@@ -1572,7 +1700,7 @@
                         <text x="100" y="200" text-anchor="middle" font-family="Arial" font-size="10" fill="#666">10th Anniversary</text>
                     </svg>
                     
-                    <div class="selfie-date">AUGUST 12, 2024</div>
+                    <div class="selfie-date">AUGUST 12, 2025</div>
                 </div>
             </div>
             <p id="locationName" style="font-size: 16px; color: #2c3e50; margin: 15px 0; font-family: 'Orbitron', sans-serif; font-weight: bold;"></p>
@@ -1621,7 +1749,7 @@
     </audio>
 
     <script>
-        // Game State
+// Game State
         let gameState = {
             playerId: null,
             playerName: '',
@@ -1676,7 +1804,7 @@
             { name: "Courtney Barwick", location: "Seattle, WA", initials: "CB", color: "#20B2AA" },
             { name: "Katie Carley", location: "Muskegon, MI", initials: "KC", color: "#778899" },
             { name: "Kylie Gemmell", location: "Buda, TX", initials: "KG", color: "#B0C4DE" },
-            { name: "Chris Fabian", location: "Thornton, CO", initials: "CF", color: "#FFD700" }, // YOU! Special color!
+            { name: "Chris Fabian", location: "Thornton, CO", initials: "CF", color: "#FFD700" },
             { name: "Felicia Johnson", location: "Hayward, CA", initials: "FJ", color: "#FF69B4" },
             { name: "Elizabeth Dragon", location: "Keene, NH", initials: "ED", color: "#8A2BE2" },
             { name: "Jason Yarbrough", location: "Columbia, SC", initials: "JY", color: "#A52A2A" },
@@ -2442,8 +2570,7 @@
             
             modal.classList.add('show');
         }
-
-        // Take Selfie - Updated to use async image capture
+// Take Selfie - Updated to use async image capture and add to reel
         async function takeSelfie() {
             const city = gameState.currentCity;
             let points = city.points;
@@ -2461,11 +2588,15 @@
                 date: new Date().toLocaleDateString(),
                 image: selfieCanvas,
                 points: points,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                playerName: gameState.playerName
             };
             
             gameState.mySelfies.push(selfie);
             console.log('Selfie saved:', selfie.location, 'Image size:', selfieCanvas.length);
+            
+            // Add to community reel
+            addToPhotoReel(selfie, true);
             
             hideLoading();
             
@@ -2507,6 +2638,9 @@
                 });
                 
                 updateLeaderboard();
+                
+                // Load community selfies to get others' photos
+                loadCommunitySelfies();
             } catch (error) {
                 console.error('Score update failed:', error);
             }
@@ -2806,6 +2940,235 @@
             document.getElementById('loadingOverlay').classList.remove('show');
         }
 
+        // Load community selfies (enhanced with photo reel)
+        async function loadCommunitySelfies() {
+            try {
+                const response = await fetch('/api/community-selfies');
+                const selfies = await response.json();
+                
+                // Store community selfies
+                gameState.communitySelfies = selfies;
+                
+                // Update the photo reel
+                updatePhotoReel();
+            } catch (error) {
+                console.error('Failed to load community selfies:', error);
+                // Use mock data for demo
+                createMockCommunitySelfies();
+            }
+        }
+
+        // Add photo to the reel
+        function addToPhotoReel(selfie, isOwn = false) {
+            const reelContainer = document.getElementById('communityReel');
+            
+            // Remove empty message if exists
+            const emptyMsg = reelContainer.querySelector('.reel-empty');
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+            
+            // Create reel item
+            const reelItem = document.createElement('div');
+            reelItem.className = 'reel-item';
+            
+            const img = document.createElement('img');
+            img.src = selfie.image;
+            img.alt = `Selfie at ${selfie.location}`;
+            
+            const info = document.createElement('div');
+            info.className = 'reel-item-info';
+            info.innerHTML = `
+                <div class="reel-item-player">${isOwn ? 'YOU' : selfie.playerName || 'Player'}</div>
+                <div class="reel-item-location">${selfie.location}</div>
+            `;
+            
+            reelItem.appendChild(img);
+            reelItem.appendChild(info);
+            
+            // Add click handler to view larger
+            reelItem.onclick = () => viewReelPhoto(selfie);
+            
+            // Add to the beginning of the reel
+            reelContainer.insertBefore(reelItem, reelContainer.firstChild);
+            
+            // Duplicate items for seamless scrolling
+            if (reelContainer.children.length < 20) {
+                const clone = reelItem.cloneNode(true);
+                clone.onclick = () => viewReelPhoto(selfie);
+                reelContainer.appendChild(clone);
+            }
+        }
+
+        // Update the entire photo reel
+        function updatePhotoReel() {
+            const reelContainer = document.getElementById('communityReel');
+            
+            // Combine your selfies with community selfies
+            const allSelfies = [
+                ...gameState.mySelfies.map(s => ({ ...s, isOwn: true })),
+                ...gameState.communitySelfies
+            ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (allSelfies.length === 0) {
+                reelContainer.innerHTML = '<div class="reel-empty">Be the first to take a selfie!</div>';
+                return;
+            }
+            
+            // Clear current reel
+            reelContainer.innerHTML = '';
+            
+            // Add all selfies to reel (duplicate for continuous scroll)
+            const itemsToShow = allSelfies.slice(0, 20);
+            
+            // Add items twice for seamless scrolling
+            for (let i = 0; i < 2; i++) {
+                itemsToShow.forEach(selfie => {
+                    const reelItem = document.createElement('div');
+                    reelItem.className = 'reel-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = selfie.image;
+                    img.alt = `Selfie at ${selfie.location}`;
+                    
+                    const info = document.createElement('div');
+                    info.className = 'reel-item-info';
+                    info.innerHTML = `
+                        <div class="reel-item-player">${selfie.isOwn ? 'YOU' : selfie.playerName || 'Player'}</div>
+                        <div class="reel-item-location">${selfie.location}</div>
+                    `;
+                    
+                    reelItem.appendChild(img);
+                    reelItem.appendChild(info);
+                    
+                    reelItem.onclick = () => viewReelPhoto(selfie);
+                    
+                    reelContainer.appendChild(reelItem);
+                });
+            }
+        }
+
+        // View a photo from the reel in a modal
+        function viewReelPhoto(selfie) {
+            // Create a simple modal to view the photo
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 3000;
+                cursor: pointer;
+            `;
+            
+            const img = document.createElement('img');
+            img.src = selfie.image;
+            img.style.cssText = `
+                max-width: 90%;
+                max-height: 90%;
+                border-radius: 10px;
+                box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            `;
+            
+            const info = document.createElement('div');
+            info.style.cssText = `
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-family: 'Orbitron', sans-serif;
+                text-align: center;
+            `;
+            info.innerHTML = `
+                <div style="font-weight: bold; color: #f1c40f;">${selfie.playerName || 'Player'}</div>
+                <div>${selfie.location}</div>
+            `;
+            
+            modal.appendChild(img);
+            modal.appendChild(info);
+            
+            modal.onclick = () => modal.remove();
+            
+            document.body.appendChild(modal);
+        }
+
+        // Create mock community selfies for demo
+        function createMockCommunitySelfies() {
+            const mockLocations = [
+                'Portland City Hall',
+                'Denver Civic Center',
+                'Austin City Hall',
+                'Seattle Municipal Tower',
+                'Phoenix City Hall',
+                'San Francisco City Hall',
+                'Boston City Hall',
+                'Chicago City Hall'
+            ];
+            
+            const mockPlayers = [
+                'Sarah M.', 'John D.', 'Emily K.', 'Mike R.', 
+                'Lisa T.', 'David W.', 'Anna B.', 'Chris L.'
+            ];
+            
+            const mockSelfies = [];
+            
+            for (let i = 0; i < 8; i++) {
+                // Create a simple placeholder image
+                const canvas = document.createElement('canvas');
+                canvas.width = 150;
+                canvas.height = 90;
+                const ctx = canvas.getContext('2d');
+                
+                // Gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                const colors = [
+                    ['#667eea', '#764ba2'],
+                    ['#f093fb', '#f5576c'],
+                    ['#4facfe', '#00f2fe'],
+                    ['#43e97b', '#38f9d7'],
+                    ['#fa709a', '#fee140'],
+                    ['#30cfd0', '#330867'],
+                    ['#a8edea', '#fed6e3'],
+                    ['#ffecd2', '#fcb69f']
+                ];
+                const [color1, color2] = colors[i % colors.length];
+                gradient.addColorStop(0, color1);
+                gradient.addColorStop(1, color2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add building silhouette
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(40, 30, 70, 60);
+                ctx.beginPath();
+                ctx.moveTo(30, 30);
+                ctx.lineTo(75, 10);
+                ctx.lineTo(120, 30);
+                ctx.closePath();
+                ctx.fill();
+                
+                mockSelfies.push({
+                    id: Date.now() + i,
+                    playerName: mockPlayers[i],
+                    location: mockLocations[i],
+                    image: canvas.toDataURL(),
+                    timestamp: new Date(Date.now() - i * 3600000).toISOString()
+                });
+            }
+            
+            gameState.communitySelfies = mockSelfies;
+            updatePhotoReel();
+        }
+
         // My Selfies Gallery Functions
         function showMySelfies() {
             const gallery = document.getElementById('selfiesGallery');
@@ -2838,12 +3201,6 @@
             document.getElementById('selfiesGallery').classList.remove('show');
         }
 
-        // Load community selfies (placeholder function)
-        function loadCommunitySelfies() {
-            // This would load from server in a real implementation
-            gameState.communitySelfies = [];
-        }
-
         // Toggle instructions (placeholder function)
         function toggleInstructions() {
             const panel = document.getElementById('instructionsPanel');
@@ -2853,6 +3210,26 @@
                 panel.style.display = 'none';
             }
         }
+
+        // Auto-refresh leaderboard
+        setInterval(() => {
+            if (document.getElementById('gameContainer').style.display === 'block') {
+                updateLeaderboard();
+            }
+        }, 30000);
+
+        // Handle enter key in search
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('locationSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchLocation();
+                    }
+                });
+            }
+        });
 
         // Initialize on page load
         window.addEventListener('load', function() {
@@ -2884,26 +3261,6 @@
                 setVH();
                 window.addEventListener('resize', setVH);
                 window.addEventListener('orientationchange', setVH);
-            }
-        });
-
-        // Auto-refresh leaderboard
-        setInterval(() => {
-            if (document.getElementById('gameContainer').style.display === 'block') {
-                updateLeaderboard();
-            }
-        }, 30000);
-
-        // Handle enter key in search
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('locationSearch');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        searchLocation();
-                    }
-                });
             }
         });
     </script>
