@@ -1077,8 +1077,9 @@
         .selfie-background {
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
             position: relative;
         }
 
@@ -1749,6 +1750,7 @@
     </audio>
 
     <script>
+
 // Game State
         let gameState = {
             playerId: null,
@@ -2649,7 +2651,7 @@
             createConfetti();
         }
 
-        // Enhanced selfie capture with real background images
+        // FIXED: Enhanced selfie capture with real background images
         async function captureSelfieImage() {
             return new Promise((resolve) => {
                 try {
@@ -2666,9 +2668,11 @@
                     const bgStyle = selfiePreview.style.backgroundImage;
                     
                     if (bgStyle && bgStyle.includes('url(')) {
-                        // Extract URL from background-image style
-                        let imageUrl = bgStyle.slice(5, -2); // Remove 'url("' and '")'
-                        if (imageUrl.startsWith('"') && imageUrl.endsWith('"')) {
+                        // Extract URL from background-image style - FIXED parsing
+                        let imageUrl = bgStyle.slice(4, -1); // Remove 'url(' and ')'
+                        
+                        // Remove quotes if present
+                        if (imageUrl.startsWith('"') || imageUrl.startsWith("'")) {
                             imageUrl = imageUrl.slice(1, -1);
                         }
                         
@@ -2676,102 +2680,170 @@
                         
                         // Create image element to draw the city hall background
                         const img = new Image();
-                        img.crossOrigin = 'anonymous';
+                        
+                        // Handle CORS for external images
+                        if (imageUrl.startsWith('http')) {
+                            img.crossOrigin = 'anonymous';
+                        }
                         
                         img.onload = function() {
+                            console.log('Background image loaded successfully');
+                            
                             // Draw the city hall background
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                             
-                            // Add semi-transparent overlay for better text readability
-                            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                            ctx.fillRect(0, 0, canvas.width, canvas.height);
-                            
-                            // Draw the selfie elements
-                            drawSelfieElements(ctx, canvas);
-                            
-                            resolve(canvas.toDataURL('image/jpeg', 0.8));
+                            // Draw the selfie elements WITH the player avatar
+                            drawSelfieElementsWithAvatar(ctx, canvas).then(() => {
+                                // Convert to data URL
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                                console.log('Selfie captured with real background');
+                                resolve(dataUrl);
+                            });
                         };
                         
-                        img.onerror = function() {
-                            console.log('Failed to load background image, using fallback');
-                            // Use fallback design
-                            drawFallbackSelfie(ctx, canvas);
-                            resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        img.onerror = function(e) {
+                            console.log('Failed to load background image, trying alternative method', e);
+                            // Alternative: Try to capture using DOM clone
+                            captureUsingDOMClone(resolve);
                         };
                         
+                        // Set the source
                         img.src = imageUrl;
                         
-                        // Timeout fallback
+                        // Timeout fallback after 5 seconds
                         setTimeout(() => {
-                            if (!img.complete) {
+                            if (!img.complete || img.naturalWidth === 0) {
                                 console.log('Image load timeout, using fallback');
-                                drawFallbackSelfie(ctx, canvas);
-                                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                                captureUsingDOMClone(resolve);
                             }
-                        }, 3000);
+                        }, 5000);
                         
                     } else {
-                        // No background image, use fallback
-                        drawFallbackSelfie(ctx, canvas);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        // No background image found, use DOM clone method
+                        captureUsingDOMClone(resolve);
                     }
                 } catch (error) {
-                    console.error('Error capturing selfie:', error);
-                    // Emergency fallback
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 600;
-                    canvas.height = 400;
-                    drawFallbackSelfie(ctx, canvas);
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    console.error('Error in captureSelfieImage:', error);
+                    captureUsingDOMClone(resolve);
                 }
             });
         }
 
-        // Draw selfie elements (avatar, text, ELGL branding)
-        function drawSelfieElements(ctx, canvas) {
-            const cityName = gameState.currentCity.name;
-            const today = new Date().toLocaleDateString();
-            
-            // Draw player avatar if available
-            if (gameState.playerPhoto) {
-                const avatarImg = new Image();
-                avatarImg.onload = function() {
-                    // Draw circular avatar in bottom center
-                    ctx.save();
+        // Alternative capture method using DOM cloning
+        function captureUsingDOMClone(resolve) {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 400;
+                
+                // Get the actual background element
+                const selfieBackground = document.getElementById('selfieBackground');
+                const bgStyle = window.getComputedStyle(selfieBackground);
+                const bgImage = bgStyle.backgroundImage;
+                
+                if (bgImage && bgImage !== 'none') {
+                    // Extract and load the background image
+                    let url = bgImage.slice(4, -1).replace(/["']/g, "");
+                    
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    img.onload = function() {
+                        // Draw background
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Draw selfie elements with avatar
+                        drawSelfieElementsWithAvatar(ctx, canvas).then(() => {
+                            resolve(canvas.toDataURL('image/jpeg', 0.9));
+                        });
+                    };
+                    
+                    img.onerror = function() {
+                        // Final fallback: draw a nice gradient background
+                        drawFallbackSelfie(ctx, canvas);
+                        resolve(canvas.toDataURL('image/jpeg', 0.9));
+                    };
+                    
+                    img.src = url;
+                } else {
+                    // No background, use fallback
+                    drawFallbackSelfie(ctx, canvas);
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                }
+            } catch (error) {
+                console.error('Error in DOM clone capture:', error);
+                // Emergency fallback
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 400;
+                drawFallbackSelfie(ctx, canvas);
+                resolve(canvas.toDataURL('image/jpeg', 0.9));
+            }
+        }
+
+        // FIXED: Draw selfie elements with proper avatar handling
+        async function drawSelfieElementsWithAvatar(ctx, canvas) {
+            return new Promise((resolve) => {
+                const cityName = gameState.currentCity.name;
+                const today = new Date().toLocaleDateString();
+                
+                // Add semi-transparent overlay for better readability
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw player avatar if available
+                if (gameState.playerPhoto) {
+                    const avatarImg = new Image();
+                    avatarImg.onload = function() {
+                        // Draw circular avatar in bottom center
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(canvas.width/2, canvas.height - 100, 50, 0, 2 * Math.PI);
+                        ctx.clip();
+                        ctx.drawImage(avatarImg, canvas.width/2 - 50, canvas.height - 150, 100, 100);
+                        ctx.restore();
+                        
+                        // Draw white border around avatar
+                        ctx.beginPath();
+                        ctx.arc(canvas.width/2, canvas.height - 100, 52, 0, 2 * Math.PI);
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                        
+                        // Draw the rest of the elements
+                        finishDrawingSelfieElements(ctx, canvas, cityName, today);
+                        resolve();
+                    };
+                    avatarImg.src = gameState.playerPhoto;
+                } else {
+                    // Draw default avatar circle
                     ctx.beginPath();
                     ctx.arc(canvas.width/2, canvas.height - 100, 50, 0, 2 * Math.PI);
-                    ctx.clip();
-                    ctx.drawImage(avatarImg, canvas.width/2 - 50, canvas.height - 150, 100, 100);
-                    ctx.restore();
-                    
-                    // Draw white border around avatar
-                    ctx.beginPath();
-                    ctx.arc(canvas.width/2, canvas.height - 100, 52, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#3498db';
+                    ctx.fill();
                     ctx.strokeStyle = 'white';
                     ctx.lineWidth = 4;
                     ctx.stroke();
-                };
-                avatarImg.src = gameState.playerPhoto;
-            } else {
-                // Draw default avatar circle
-                ctx.beginPath();
-                ctx.arc(canvas.width/2, canvas.height - 100, 50, 0, 2 * Math.PI);
-                ctx.fillStyle = '#3498db';
-                ctx.fill();
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-                
-                // Add initials
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(gameState.playerName.charAt(0).toUpperCase(), canvas.width/2, canvas.height - 90);
-            }
-            
+                    
+                    // Add initials
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(gameState.playerName.charAt(0).toUpperCase(), canvas.width/2, canvas.height - 90);
+                    
+                    // Draw the rest of the elements
+                    finishDrawingSelfieElements(ctx, canvas, cityName, today);
+                    resolve();
+                }
+            });
+        }
+
+        // Helper function to finish drawing selfie elements
+        function finishDrawingSelfieElements(ctx, canvas, cityName, today) {
             // Draw location text with background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
             ctx.fillRect(20, canvas.height - 60, canvas.width - 40, 40);
             
             ctx.fillStyle = '#2c3e50';
@@ -2831,8 +2903,8 @@
                 ctx.fillRect(220 + i * 40, 120, 20, 130);
             }
             
-            // Draw selfie elements
-            drawSelfieElements(ctx, canvas);
+            // Draw selfie elements with avatar
+            drawSelfieElementsWithAvatar(ctx, canvas);
         }
 
         // Show Points Animation
