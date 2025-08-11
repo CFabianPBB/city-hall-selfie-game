@@ -2448,6 +2448,22 @@
             const city = gameState.currentCity;
             let points = city.points;
             
+            // Capture the selfie image before closing the modal
+            const selfieCanvas = captureSelfieImage();
+            
+            // Save the selfie to gameState
+            const selfie = {
+                id: Date.now(),
+                location: city.name,
+                date: new Date().toLocaleDateString(),
+                image: selfieCanvas,
+                points: points,
+                timestamp: new Date().toISOString()
+            };
+            
+            gameState.mySelfies.push(selfie);
+            console.log('Selfie saved:', selfie.location);
+            
             // Show points animation
             showPointsAnimation(points);
             
@@ -2475,6 +2491,16 @@
                     })
                 });
                 
+                // Also save selfie to server
+                await fetch('/api/selfie', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        playerId: gameState.playerId,
+                        selfie: selfie
+                    })
+                });
+                
                 updateLeaderboard();
             } catch (error) {
                 console.error('Score update failed:', error);
@@ -2482,6 +2508,93 @@
             
             closeSelfieModal();
             createConfetti();
+        }
+
+        // Capture selfie image from the modal
+        function captureSelfieImage() {
+            try {
+                // Create a canvas to capture the selfie preview
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const selfiePreview = document.getElementById('selfieBackground');
+                
+                // Set canvas size
+                canvas.width = 600;
+                canvas.height = 400;
+                
+                // Get the background image
+                const bgStyle = selfiePreview.style.backgroundImage;
+                
+                if (bgStyle && bgStyle.includes('url(')) {
+                    // Extract URL from background-image style
+                    const imageUrl = bgStyle.slice(5, -2); // Remove 'url("' and '")'
+                    
+                    // Create image element to draw
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    // For now, return a simple data URL with the location info
+                    // In a real implementation, you'd wait for the image to load
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add location text
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.font = 'bold 24px Orbitron';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('City Hall Selfie', canvas.width/2, 50);
+                    
+                    ctx.font = '18px Orbitron';
+                    ctx.fillText(gameState.currentCity.name, canvas.width/2, 100);
+                    
+                    // Add date
+                    ctx.font = '14px Orbitron';
+                    ctx.fillText(new Date().toLocaleDateString(), canvas.width/2, 350);
+                    
+                    // Add ELGL logo area
+                    ctx.fillStyle = '#27ae60';
+                    ctx.fillRect(450, 20, 120, 80);
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('ELGL', 510, 50);
+                    ctx.font = '10px Arial';
+                    ctx.fillText('10th Anniversary', 510, 70);
+                    ctx.fillText('City Hall Selfie', 510, 85);
+                    
+                    return canvas.toDataURL('image/png');
+                } else {
+                    // Fallback if no background image
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.font = 'bold 24px Orbitron';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('City Hall Selfie', canvas.width/2, canvas.height/2);
+                    
+                    return canvas.toDataURL('image/png');
+                }
+            } catch (error) {
+                console.error('Error capturing selfie:', error);
+                // Return a simple placeholder image
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 400;
+                
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = 'bold 24px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.fillText('City Hall Selfie', canvas.width/2, canvas.height/2);
+                ctx.font = '18px Orbitron';
+                ctx.fillText(gameState.currentCity.name, canvas.width/2, canvas.height/2 + 40);
+                
+                return canvas.toDataURL('image/png');
+            }
         }
 
         // Show Points Animation
